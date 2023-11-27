@@ -24,18 +24,35 @@ require('lazy').setup({
 	},
 	'navarasu/onedark.nvim',
 	'nvim-lualine/lualine.nvim',
+	{
+		"nvim-treesitter/nvim-treesitter", 
+		build = ":TSUpdate",
+		config = function ()
+			local configs = require("nvim-treesitter.configs")
+			configs.setup({
+				ensure_installed = { "go", "lua", "vim"},
+				sync_install = false,
+				higlight = {enable = true},
+				indent = {enable = true},
+			})
+		end
+	}
 })
 
 
 vim.wo.number = true
 vim.wo.rnu = true
+
 vim.o.undofile = true
 vim.o.mouse = 'a'
+vim.opt.colorcolumn = "80"
+
 vim.cmd.colorscheme 'onedark'
 
 local telescope = require('telescope.builtin')
 
 vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
+vim.keymap.set('n', '<C-p>', telescope.git_files, {})
 
 -- If fzf is installed, we ensure that telescope is going to use it
 pcall(require('telescope').load_extension, 'fzf')
