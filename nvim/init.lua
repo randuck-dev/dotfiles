@@ -1,6 +1,4 @@
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
+require("randuck")
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
@@ -36,16 +34,17 @@ require('lazy').setup({
 				indent = {enable = true},
 			})
 		end
-	}
+	},
+
+	{'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
+	{'williamboman/mason.nvim'},
+	{'williamboman/mason-lspconfig.nvim'},
+	{'neovim/nvim-lspconfig'},
+	{'hrsh7th/cmp-nvim-lsp'},
+	{'hrsh7th/nvim-cmp'},
+	{'L3MON4D3/LuaSnip'},
 })
 
-
-vim.wo.number = true
-vim.wo.rnu = true
-
-vim.o.undofile = true
-vim.o.mouse = 'a'
-vim.opt.colorcolumn = "80"
 
 vim.cmd.colorscheme 'onedark'
 
@@ -67,3 +66,25 @@ require('lualine').setup {
   },
 }
 
+local lsp_zero = require('lsp-zero')
+
+lsp_zero.on_attach(function(client, bufnr)
+  -- see :help lsp-zero-keybindings
+  -- to learn the available actions
+  lsp_zero.default_keymaps({buffer = bufnr})
+end)
+
+-- see :help lsp-zero-guide:integrate-with-mason-nvim
+-- to learn how to use mason.nvim with lsp-zero
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {"lua_ls", "gopls", "bashls"},
+  handlers = {
+    lsp_zero.default_setup,
+    lua_ls = function()
+      local lua_opts = lsp_zero.nvim_lua_ls()
+
+      require('lspconfig').lua_ls.setup(lua_opts)
+    end,
+  }
+})
