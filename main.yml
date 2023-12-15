@@ -1,0 +1,55 @@
+- name: Install basic dependencies
+  hosts: localhost
+  become: false
+
+  tasks:
+    - name: "Install vscode"
+      homebrew_cask:
+        name: visual-studio-code
+        state: present
+        accept_external_apps: true
+
+    - name: "Install go"
+      homebrew:
+        name: go
+        state: present
+
+    - name: "Install tmux"
+      homebrew:
+        name: tmux
+        state: present
+
+    - name: "Install neovim"
+      homebrew:
+        name: neovim
+        state: present
+
+    - name: "Install lazygit"
+      homebrew:
+        name: lazygit
+        state: present
+
+    - name: "Install fzf"
+      homebrew:
+        name: fzf
+        state: present
+
+    - name: "Install jq"
+      homebrew:
+        name: jq
+        state: present
+
+    - name: "Install ripgrep"
+      homebrew:
+        name: ripgrep
+        state: present
+
+    - name: "Install opentofu"
+      homebrew:
+        name: opentofu
+        state: present
+
+    - name: "Install awscli"
+      homebrew:
+        name: awscli
+        state: present
