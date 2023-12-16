@@ -49,6 +49,8 @@ require('lazy').setup({
 
 local telescope = require('telescope.builtin')
 
+vim.cmd.colorscheme = "catppuccin-frappe"
+
 vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
 vim.keymap.set('n', '<C-p>', telescope.git_files, {})
 
@@ -59,7 +61,7 @@ pcall(require('telescope').load_extension, 'fzf')
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'onedark',
+    theme = 'catppuccin-frappe',
     component_separators = '|',
     section_separators = '',
   },
