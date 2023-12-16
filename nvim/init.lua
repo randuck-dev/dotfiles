@@ -47,8 +47,6 @@ require('lazy').setup({
 })
 
 
-vim.cmd.colorscheme 'onedark'
-
 local telescope = require('telescope.builtin')
 
 vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
