@@ -26,7 +26,9 @@ fi
 if ! [ -d $ALACRITTY_THEMES_DIR ]; then
     echo "alacritty themes not found"
     mkdir -p ~/.config/alacritty/themes
-    git clone https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
+
+    git clone -b yaml https://github.com/alacritty/alacritty-theme $ALACRITTY_THEMES_DIR
+    
 else
     echo "alacritty themes found"
 fi
@@ -39,7 +41,7 @@ else
 fi
 
 ln -sf "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
-ln -sf "$DOTFILES_DIR/alacritty.yml" "$ALACRITTY_DIR/alacritty.yml"
+ln -sf "$DOTFILES_DIR/alacritty.yml" "$ALACRITTY_DIR/alacrit  ty.yml"
 
 
 # Run install of rest of the deps in the end
