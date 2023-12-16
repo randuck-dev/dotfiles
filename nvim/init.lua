@@ -40,8 +40,12 @@ require('lazy').setup({
 	{'williamboman/mason.nvim'},
 	{'williamboman/mason-lspconfig.nvim'},
 	{'neovim/nvim-lspconfig'},
+
+	-- completion engine
 	{'hrsh7th/cmp-nvim-lsp'},
 	{'hrsh7th/nvim-cmp'},
+	-- 
+
 	{'L3MON4D3/LuaSnip'},
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }
 })
@@ -51,8 +55,8 @@ local telescope = require('telescope.builtin')
 
 vim.cmd.colorscheme = "catppuccin-frappe"
 
-vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
-vim.keymap.set('n', '<C-p>', telescope.git_files, {})
+vim.keymap.set('n', '<leader>ff', telescope.git_files, {})
+vim.keymap.set('n', '<C-p>', telescope.find_files, {})
 
 -- If fzf is installed, we ensure that telescope is going to use it
 pcall(require('telescope').load_extension, 'fzf')
@@ -75,11 +79,12 @@ lsp_zero.on_attach(function(client, bufnr)
   lsp_zero.default_keymaps({buffer = bufnr})
 end)
 
+
 -- see :help lsp-zero-guide:integrate-with-mason-nvim
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "gopls", "bashls"},
+  ensure_installed = {"lua_ls", "gopls", "bashls", "rust_analyzer", "jedi_language_server"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -89,3 +94,28 @@ require('mason-lspconfig').setup({
     end,
   }
 })
+
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
+
+cmp.setup({
+    window = {
+	    completion =	cmp.config.window.bordered(),
+    	documentation = cmp.config.window.bordered(),
+    },
+
+    mapping = cmp.mapping.preset.insert({
+    	['<C-Space>'] = cmp.mapping.complete(),
+	    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+	    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+	    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+	    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    }),
+
+    sources = {
+	    {name = 'nvim_lsp'}
+    }
+})
+
+
