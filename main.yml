@@ -69,3 +69,13 @@
       homebrew:
         name: awscli
         state: present
+
+    - name: "Install wget"
+      homebrew:
+        name: wget
+        state: present
+
+    - name: "Install just"
+      homebrew:
+        name: just
+        state: present
