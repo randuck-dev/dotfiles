@@ -1,0 +1,19 @@
+import:
+  - "~/.config/alacritty/themes/themes/catppuccin_frappe.yaml"
+
+
+font:
+  normal:
+    family: "SFMono Nerd Font"
+    style: Light
+  italic:
+    family: "SFMono Nerd Font"
+    style: Medium Italic
+  bold:
+    family: "SFMono Nerd Font"
+    style: Medium
+  bold_italic:
+    family: "SFMono Nerd Font"
+    style: Heavy Italic
+
+  size: 12.0

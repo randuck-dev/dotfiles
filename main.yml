@@ -3,9 +3,25 @@
   become: false
 
   tasks:
+    - name: "Tap epk (nerdfonts)"
+      homebrew_tap:
+        name: epk/epk
+        state: present
+    
+    - name: "Install sf nerdfont"
+      homebrew_cask:
+        name: font-sf-mono-nerd-font
+        state: present
+
     - name: "Install vscode"
       homebrew_cask:
         name: visual-studio-code
+        state: present
+        accept_external_apps: true
+
+    - name: "Install alacritty"
+      homebrew_cask:
+        name: alacritty
         state: present
         accept_external_apps: true
 
