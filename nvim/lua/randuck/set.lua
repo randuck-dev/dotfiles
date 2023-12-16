@@ -6,3 +6,5 @@ vim.o.undofile = true
 vim.o.mouse = 'a'
 vim.o.scrolloff = 8
 vim.o.colorcolumn = "80"
+
+vim.o.shiftwidth = 4
