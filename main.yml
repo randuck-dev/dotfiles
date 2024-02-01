@@ -1,81 +1,126 @@
 - name: Install basic dependencies
   hosts: localhost
-  become: false
+  vars:
+    should_become: "{{ False if ansible_os_family == 'Darwin' else True }}"
 
   tasks:
-    - name: "Tap epk (nerdfonts)"
-      homebrew_tap:
-        name: epk/epk
-        state: present
+    - block:
+      - name: Install brew packages
+        community.general.homebrew_tap:
+          name: "{{ item }}"
+          state: present
+        loop:
+          - epk/epk
+
+      - name: "Install sf nerdfont"
+        homebrew_cask:
+          name: font-sf-mono-nerd-font
+          state: present
+
+      - name: "Install casks"
+        community.general.homebrew_cask:
+          accept_external_apps: true
+          name: "{{ item }}"
+        loop: 
+          - visual-studio-code
+          - alacritty
+
+      - name: "Install deps"
+        community.general.homebrew:
+          name: "{{ item }}"
+          state: present
+        loop:
+          - go
+          - tmux
+          - neovim
+          - lazygit
+          - fzf
+          - jq
+          - ripgrep
+          - opentofu
+          - awscli
+          - wget
+          - just
+
+      when: ansible_os_family == 'Darwin'
     
-    - name: "Install sf nerdfont"
-      homebrew_cask:
-        name: font-sf-mono-nerd-font
-        state: present
+    - block:
+      - name: "AzureCLI"
+        shell: 
+          cmd: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-    - name: "Install vscode"
-      homebrew_cask:
-        name: visual-studio-code
-        state: present
-        accept_external_apps: true
+      - name: "Install dependencies"
+        apt:
+          name: "{{ item }}"
+          state: present
+        loop:
+          - git
+          - tmux
+          - wget
+          - dnsutils
+          - fzf
+          - ripgrep
+          - zsh
 
-    - name: "Install alacritty"
-      homebrew_cask:
-        name: alacritty
-        state: present
-        accept_external_apps: true
+      - name: "Install rust"
+        shell:
+          cmd: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
-    - name: "Install go"
-      homebrew:
-        name: go
-        state: present
+      - name: "Check if installed oh-my-zsh"
+        stat:
+          path: ~/.oh-my-zsh
+        register: oh_my_zsh
+        become: False
 
-    - name: "Install tmux"
-      homebrew:
-        name: tmux
-        state: present
+      - name: "Install oh-my-zsh" 
+        shell:
+          cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 
+        become: False
+        when: oh_my_zsh.stat.exists == False
 
-    - name: "Install neovim"
-      homebrew:
-        name: neovim
-        state: present
+      - name: "Change to zsh shell"
+        user:
+          name: "{{ ansible_user_id }}"
+          shell: /bin/zsh
 
-    - name: "Install lazygit"
-      homebrew:
-        name: lazygit
-        state: present
+      - name: "Install neovim unstable"
+        shell:
+          cmd: sudo add-apt-repository ppa:neovim-ppa/unstable -y && sudo apt-get update && sudo apt-get install neovim -y
+        become: "{{ should_become }}"
 
-    - name: "Install fzf"
-      homebrew:
-        name: fzf
-        state: present
+      - name: "Check go 1.21"
+        shell:
+          cmd: go version
+        register: go_version
+        failed_when: False
+        become: False
 
-    - name: "Install jq"
-      homebrew:
-        name: jq
-        state: present
+      - name: "Install go 1.21"
+        shell:
+          cmd: wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz && rm go1.21.6.linux-amd64.tar.gz
+        when : go_version.rc != 0
 
-    - name: "Install ripgrep"
-      homebrew:
-        name: ripgrep
-        state: present
 
-    - name: "Install opentofu"
-      homebrew:
-        name: opentofu
-        state: present
+      - name: "Check for lazygit"
+        shell:
+          cmd: lazygit --version
+        register: lazygit_version
+        failed_when: False
+        become: False
+      - name: "Install lazygit"
+        shell:
+          cmd: |
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+            curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+            tar xf lazygit.tar.gz lazygit
+            sudo install lazygit /usr/local/bin
+            rm lazygit.tar.gz lazygit
+        become: "{{ should_become }}"
+        when: lazygit_version.rc != 0
+  
+      become: "{{ should_become }}"
+      when: ansible_os_family != 'Darwin'
 
-    - name: "Install awscli"
-      homebrew:
-        name: awscli
-        state: present
 
-    - name: "Install wget"
-      homebrew:
-        name: wget
-        state: present
 
-    - name: "Install just"
-      homebrew:
-        name: just
-        state: present
+        

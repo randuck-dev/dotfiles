@@ -84,7 +84,7 @@ end)
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "gopls", "bashls", "rust_analyzer", "jedi_language_server"},
+  ensure_installed = {"lua_ls", "gopls", "rust_analyzer"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
