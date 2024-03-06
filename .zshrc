@@ -102,5 +102,6 @@ source $ZSH/oh-my-zsh.sh
 
 
 export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:$HOME/.cargo/bin
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles"
