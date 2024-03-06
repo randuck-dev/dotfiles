@@ -16,19 +16,19 @@ vim.opt.rtp:prepend(lazypath)
 
 
 require('lazy').setup({
-	{ 
+	{
 		'nvim-telescope/telescope.nvim', tag = '0.1.4',
 		dependencies = {'nvim-lua/plenary.nvim'}
 	},
 	'navarasu/onedark.nvim',
 	'nvim-lualine/lualine.nvim',
 	{
-		"nvim-treesitter/nvim-treesitter", 
+		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		config = function ()
 			local configs = require("nvim-treesitter.configs")
 			configs.setup({
-				ensure_installed = { "go", "lua", "vim"},
+				ensure_installed = { "go", "lua", "vim", "markdown", "markdown_inline", "hcl"},
 				sync_install = false,
 				higlight = {enable = true},
 				indent = {enable = true},
@@ -40,11 +40,11 @@ require('lazy').setup({
 	{'williamboman/mason.nvim'},
 	{'williamboman/mason-lspconfig.nvim'},
 	{'neovim/nvim-lspconfig'},
+    { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
 
 	-- completion engine
 	{'hrsh7th/cmp-nvim-lsp'},
 	{'hrsh7th/nvim-cmp'},
-	-- 
 
 	{'L3MON4D3/LuaSnip'},
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }
@@ -53,10 +53,10 @@ require('lazy').setup({
 
 local telescope = require('telescope.builtin')
 
-vim.cmd.colorscheme = "catppuccin-frappe"
 
 vim.keymap.set('n', '<leader>ff', telescope.git_files, {})
 vim.keymap.set('n', '<C-p>', telescope.find_files, {})
+vim.keymap.set('n', '<C-b>', telescope.buffers, {})
 
 -- If fzf is installed, we ensure that telescope is going to use it
 pcall(require('telescope').load_extension, 'fzf')
@@ -65,7 +65,7 @@ pcall(require('telescope').load_extension, 'fzf')
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'catppuccin-frappe',
+    theme = 'catppuccin',
     component_separators = '|',
     section_separators = '',
   },
@@ -84,7 +84,7 @@ end)
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "gopls", "rust_analyzer"},
+  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "terraformls"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -118,4 +118,7 @@ cmp.setup({
     }
 })
 
+vim.cmd [[ colorscheme catppuccin ]]
 
+
+require("ibl").setup()
