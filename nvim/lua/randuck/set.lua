@@ -6,6 +6,7 @@ vim.o.undofile = true
 vim.o.mouse = 'a'
 vim.o.scrolloff = 8
 vim.o.colorcolumn = "80"
+vim.o.termguicolors = true
 
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
