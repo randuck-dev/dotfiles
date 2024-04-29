@@ -63,7 +63,6 @@ require('lazy').setup({
     }
 })
 
-
 local telescope = require('telescope.builtin')
 
 
@@ -71,7 +70,11 @@ vim.keymap.set('n', '<leader>ff', telescope.git_files, {})
 vim.keymap.set('n', '<C-p>', telescope.find_files, {})
 vim.keymap.set('n', '<C-b>', telescope.buffers, {})
 vim.keymap.set('n', '<leader>g', telescope.live_grep, {})
-vim.keymap.set('n', '<leader>l', ":bnext<CR>", {})
+vim.keymap.set('n', '<S-l>', ":bnext<CR>", {})
+vim.keymap.set('n', '<S-h>', ":bprevious<CR>", {})
+
+local opts = { noremap = true, silent = true }
+vim.keymap.set('n', '<leader>ti', ":!terraform -chdir=%:p:h init<CR>", opts)
 
 -- If fzf is installed, we ensure that telescope is going to use it
 pcall(require('telescope').load_extension, 'fzf')
@@ -95,6 +98,7 @@ lsp_zero.on_attach(function(client, bufnr)
 end)
 
 
+
 -- see :help lsp-zero-guide:integrate-with-mason-nvim
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
@@ -115,7 +119,6 @@ require('mason-lspconfig').setup({
     tflint = function ()
         require('lspconfig').tflint.setup({})
     end
-    
 
   }
 })
