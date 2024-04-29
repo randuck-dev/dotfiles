@@ -45,6 +45,7 @@ require('lazy').setup({
 	-- completion engine
 	{'hrsh7th/cmp-nvim-lsp'},
 	{'hrsh7th/nvim-cmp'},
+    { "elentok/format-on-save.nvim" },
 
 	{'L3MON4D3/LuaSnip'},
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
@@ -98,7 +99,7 @@ end)
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright"},
+  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright", "terraformls", "tflint"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -106,6 +107,16 @@ require('mason-lspconfig').setup({
 
       require('lspconfig').lua_ls.setup(lua_opts)
     end,
+
+    terraformls = function()
+        require('lspconfig').terraformls.setup({})
+    end,
+
+    tflint = function ()
+        require('lspconfig').tflint.setup({})
+    end
+    
+
   }
 })
 
@@ -137,3 +148,13 @@ vim.cmd [[ colorscheme catppuccin ]]
 
 
 require("ibl").setup()
+
+
+local format_on_save = require("format-on-save")
+local formatters = require("format-on-save.formatters")
+
+format_on_save.setup({
+    formatter_by_ft = {
+        terraform = formatters.lsp
+    }
+})

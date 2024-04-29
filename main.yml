@@ -59,6 +59,7 @@
           - wget
           - dnsutils
           - fzf
+          - unzip
           - ripgrep
           - python3-venv
           - zsh
