@@ -47,7 +47,19 @@ require('lazy').setup({
 	{'hrsh7th/nvim-cmp'},
 
 	{'L3MON4D3/LuaSnip'},
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+
+    {
+          "folke/todo-comments.nvim",
+          dependencies = { "nvim-lua/plenary.nvim" },
+          opts = {
+            signs = false,
+            higlight = {
+              multiline = true,
+              multiline_pattern = "^."
+            }
+          }
+    }
 })
 
 
@@ -57,6 +69,8 @@ local telescope = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', telescope.git_files, {})
 vim.keymap.set('n', '<C-p>', telescope.find_files, {})
 vim.keymap.set('n', '<C-b>', telescope.buffers, {})
+vim.keymap.set('n', '<leader>g', telescope.live_grep, {})
+vim.keymap.set('n', '<leader>l', ":bnext<CR>", {})
 
 -- If fzf is installed, we ensure that telescope is going to use it
 pcall(require('telescope').load_extension, 'fzf')
@@ -84,7 +98,7 @@ end)
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "terraformls"},
+  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
@@ -95,6 +109,7 @@ require('mason-lspconfig').setup({
   }
 })
 
+require("lspconfig").pyright.setup({})
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()

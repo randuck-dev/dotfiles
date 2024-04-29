@@ -60,6 +60,7 @@
           - dnsutils
           - fzf
           - ripgrep
+          - python3-venv
           - zsh
 
       - name: "Install rust"
@@ -147,6 +148,4 @@
         name: user.email
         value: "mail@raphaelneumann.dk"
       become: False
-
-
         
