@@ -134,6 +134,9 @@ require('lazy').setup({
         },
         panel = {
           enabled = false
+        },
+        filetypes = {
+          yaml = true
         }
       })
     end
@@ -222,6 +225,7 @@ local opts = { noremap = true, silent = true }
 -- Terraform Shortcuts Begin
 vim.keymap.set('n', '<leader>ti', ":!terraform -chdir=%:p:h init<CR>", opts)
 vim.keymap.set('n', '<leader>tp', ":!terraform -chdir=%:p:h plan<CR>", opts)
+vim.keymap.set('i', '<S-Tab>', '<C-d>', {})
 
 -- Terraform Shortcuts End 
 
