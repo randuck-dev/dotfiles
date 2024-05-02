@@ -123,7 +123,46 @@ require('lazy').setup({
   },
 
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-
+  {
+    "zbirenbaum/copilot.lua",
+    event = "InsertEnter",
+    cmd = "Copilot",
+    config = function ()
+      require('copilot').setup({
+        suggestion = {
+          auto_trigger = false
+        },
+        panel = {
+          enabled = false
+        }
+      })
+    end
+  },
+  {
+        "kdheepak/lazygit.nvim",
+      cmd = {
+        "LazyGit",
+        "LazyGitConfig",
+        "LazyGitCurrentFile",
+        "LazyGitFilter",
+        "LazyGitFilterCurrentFile",
+      },
+        -- optional for floating window border decoration
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+        },
+        -- setting the keybinding for LazyGit with 'keys' is recommended in
+        -- order to load the plugin when the command is run for the first time
+        keys = {
+           { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+        }
+    },
+  {
+    "zbirenbaum/copilot-cmp",
+    config = function ()
+      require("copilot_cmp").setup()
+    end
+  },
     {
           "folke/todo-comments.nvim",
           dependencies = { "nvim-lua/plenary.nvim" },
@@ -253,7 +292,8 @@ cmp.setup({
     }),
 
     sources = {
-	    {name = 'nvim_lsp'}
+      {name = 'copilot', group_index = 2},
+	    {name = 'nvim_lsp', group_index = 2}
     }
 })
 
