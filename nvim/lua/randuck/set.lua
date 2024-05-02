@@ -15,3 +15,14 @@ vim.o.expandtab = true
 
 vim.o.smartindent = true
 
+
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
+
+
+-- Synchronize clipboard between OS and nvim
+vim.opt.clipboard = 'unnamedplus'
+
