@@ -17,8 +17,47 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
 	{
-		'nvim-telescope/telescope.nvim', tag = '0.1.4',
-		dependencies = {'nvim-lua/plenary.nvim'}
+    'nvim-telescope/telescope.nvim',
+    event = 'VimEnter',
+    branch = '0.1.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { -- If encountering errors, see telescope-fzf-native README for installation instructions
+        'nvim-telescope/telescope-fzf-native.nvim',
+
+        -- `build` is used to run some command when the plugin is installed/updated.
+        -- This is only run then, not every time Neovim starts up.
+        build = 'make',
+
+        -- `cond` is a condition used to determine whether this plugin should be
+        -- installed and loaded.
+        cond = function()
+          return vim.fn.executable 'make' == 1
+        end,
+      },
+      { 'nvim-telescope/telescope-ui-select.nvim' },
+
+      -- Useful for getting pretty icons, but requires a Nerd Font.
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+    },
+    config = function ()
+      local builtin = require 'telescope.builtin'
+
+      vim.keymap.set('n', '<leader>sh', builtin.help_tags, {})
+      vim.keymap.set('n', '<leader>sg', builtin.git_files, {})
+      vim.keymap.set('n', '<leader>sf', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>sb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>sl', builtin.live_grep, {})
+
+      vim.keymap.set('n', '<leader>/', function()
+        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+        winblend = 10,
+        previewer = false,
+        })
+      end, { desc = '[/] Fuzzily search in current buffer' })
+
+    end
 	},
 	'navarasu/onedark.nvim',
 	'nvim-lualine/lualine.nvim',
@@ -95,17 +134,31 @@ require('lazy').setup({
               multiline_pattern = "^."
             }
           }
-    }
+    },
+}, {
+  ui = {
+    -- If you are using a Nerd Font: set icons to an empty table which will use the
+    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
+    icons = vim.g.have_nerd_font and {} or {
+      cmd = '⌘',
+      config = '🛠',
+      event = '📅',
+      ft = '📂',
+      init = '⚙',
+      keys = '🗝',
+      plugin = '🔌',
+      runtime = '💻',
+      require = '🌙',
+      source = '📄',
+      start = '🚀',
+      task = '📌',
+      lazy = '💤 ',
+    },
+  },
 })
 
 -- Telescope Begin
 local telescope = require('telescope.builtin')
-
-vim.keymap.set('n', '<leader>sh', telescope.help_tags, {})
-vim.keymap.set('n', '<leader>sg', telescope.git_files, {})
-vim.keymap.set('n', '<leader>sf', telescope.find_files, {})
-vim.keymap.set('n', '<leader>sb', telescope.buffers, {})
-vim.keymap.set('n', '<leader>sl', telescope.live_grep, {})
 
 -- Telesecope End
 
@@ -218,3 +271,12 @@ format_on_save.setup({
         terraform = formatters.lsp
     }
 })
+
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+

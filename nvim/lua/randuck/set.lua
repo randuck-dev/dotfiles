@@ -22,7 +22,11 @@ vim.opt.splitbelow = true
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
 
+vim.g.have_nerd_font = true
+
 
 -- Synchronize clipboard between OS and nvim
 vim.opt.clipboard = 'unnamedplus'
 
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
