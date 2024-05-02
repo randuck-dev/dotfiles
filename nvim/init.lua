@@ -219,6 +219,8 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<leader>wh', ":split<CR>", {})
 vim.keymap.set('n', '<leader>wv', ":vsplit<CR>", {})
 
+vim.keymap.set('n', '<S-u>', "[m", { desc = 'Move to the previous [m]ark' })
+vim.keymap.set('n', '<S-i>', "]m", { desc = 'Move to the next [m]ark' })
 
 local opts = { noremap = true, silent = true }
 
