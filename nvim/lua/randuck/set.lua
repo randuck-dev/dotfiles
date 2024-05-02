@@ -19,8 +19,8 @@ vim.o.smartindent = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
-vim.opt.updatetime = 250
-vim.opt.timeoutlen = 300
+-- vim.opt.updatetime = 250
+-- vim.opt.timeoutlen = 300
 
 vim.g.have_nerd_font = true
 
