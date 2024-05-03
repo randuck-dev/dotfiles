@@ -17,6 +17,11 @@
           name: font-sf-mono-nerd-font
           state: present
 
+      - name: "Install Caskaydia Mono Nerdfont"
+        homebrew_cask:
+          name: font-caskaydia-cove-nerd-font
+          state: present
+
       - name: "Install casks"
         community.general.homebrew_cask:
           accept_external_apps: true
