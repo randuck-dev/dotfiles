@@ -57,6 +57,10 @@ require('lazy').setup({
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
 
+
+      vim.keymap.set('n', '<leader>sn', function ()
+        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+      end, { desc = '[S]earch [N]eovim files'})
     end
 	},
 	'navarasu/onedark.nvim',
@@ -199,10 +203,6 @@ require('lazy').setup({
   },
 })
 
--- Telescope Begin
-local telescope = require('telescope.builtin')
-
--- Telesecope End
 
 -- Diagnostic Begin
 
@@ -224,10 +224,13 @@ vim.keymap.set('n', '<S-i>', "]m", { desc = 'Move to the next [m]ark' })
 
 local opts = { noremap = true, silent = true }
 
+vim.keymap.set('n', '<Space>', "<Nop>", opts)
+
 -- Terraform Shortcuts Begin
 vim.keymap.set('n', '<leader>ti', ":!terraform -chdir=%:p:h init<CR>", opts)
 vim.keymap.set('n', '<leader>tp', ":!terraform -chdir=%:p:h plan<CR>", opts)
 vim.keymap.set('i', '<S-Tab>', '<C-d>', {})
+
 
 -- Terraform Shortcuts End 
 
