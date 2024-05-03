@@ -30,3 +30,6 @@ vim.opt.clipboard = 'unnamedplus'
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
+
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
