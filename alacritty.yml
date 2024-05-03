@@ -4,16 +4,16 @@ import:
 
 font:
   normal:
-    family: "SFMono Nerd Font"
-    style: Light
+    family: "CaskaydiaCove NFM"
+    style: Regular 
   italic:
-    family: "SFMono Nerd Font"
-    style: Medium Italic
+    family: "CaskaydiaCove NFM"
+    style: Italic
   bold:
-    family: "SFMono Nerd Font"
+    family: "CaskaydiaCove NFM"
     style: Medium
   bold_italic:
-    family: "SFMono Nerd Font"
+    family: "CaskaydiaCove NFM"
     style: Heavy Italic
 
   size: 12.0
