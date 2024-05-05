@@ -43,11 +43,18 @@ require('lazy').setup({
     config = function ()
       local builtin = require 'telescope.builtin'
 
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, {})
-      vim.keymap.set('n', '<leader>sg', builtin.git_files, {})
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, {})
-      vim.keymap.set('n', '<leader>sb', builtin.buffers, {})
-      vim.keymap.set('n', '<leader>sl', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = "[S]earch [H]elp tags" })
+      vim.keymap.set('n', '<leader>sg', builtin.git_files, { desc = '[S]earch [G]it files' })
+      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[S]earch [B]uffers' })
+      vim.keymap.set('n', '<leader>sl', builtin.live_grep, { desc = '[S]earch [L]ive' })
+
+      vim.keymap.set('n', 'gd', builtin.lsp_definitions, { desc = 'Go to [D]efinition' })
+      vim.keymap.set('n', 'gr', builtin.lsp_references, { desc = 'Go to [R]eferences' })
+
+
+      vim.keymap.set('n', "<leader>D", builtin.lsp_type_definitions, { desc = 'Go to Type [D]efinition' })
+      vim.keymap.set('n', "<leader>ds", builtin.lsp_document_symbols, { desc = 'Go to [D]ocument [S]ymbols' })
 
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -63,6 +70,33 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files'})
     end
 	},
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" }
+  },
+   { -- Useful plugin to show you pending keybinds.
+    'folke/which-key.nvim',
+    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    config = function() -- This is the function that runs, AFTER loading
+      require('which-key').setup()
+
+      -- Document existing key chains
+      require('which-key').register {
+        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      }
+      -- visual mode
+      require('which-key').register({
+        ['<leader>h'] = { 'Git [H]unk' },
+      }, { mode = 'v' })
+    end,
+  },
 	'navarasu/onedark.nvim',
 	'nvim-lualine/lualine.nvim',
 	{
@@ -81,12 +115,23 @@ require('lazy').setup({
 
 	{'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
 	{'williamboman/mason.nvim'},
-	{'williamboman/mason-lspconfig.nvim'},
+	{'williamboman/mason-lspconfig.nvim', dependencies = {
+    { 'j-hui/fidget.nvim', opts = {} },
+    { 'folke/neodev.nvim', opts = {} },
+  }},
 	{'neovim/nvim-lspconfig', config = function ()
     -- We wait for the lsp to attach, and then we end up setting up the LSP keymaps
     vim.api.nvim_create_autocmd('LspAttach', {
       callback = function(event)
-        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, {})
+        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = '[R]e[n]ame' })
+        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = '[C]ode [A]ction' })
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, { desc = 'Hover Documentation' })
+
+        if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          map('<leader>th', function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+          end, '[T]oggle Inlay [H]ints')
+        end
       end
     })
 	end},
@@ -264,39 +309,8 @@ require('lualine').setup {
   },
 }
 
-local lsp_zero = require('lsp-zero')
 
-lsp_zero.on_attach(function(client, bufnr)
-  -- see :help lsp-zero-keybindings
-  -- to learn the available actions
-  lsp_zero.default_keymaps({buffer = bufnr})
-end)
-
-
-
--- see :help lsp-zero-guide:integrate-with-mason-nvim
--- to learn how to use mason.nvim with lsp-zero
-require('mason').setup({})
-require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright", "terraformls", "tflint"},
-  handlers = {
-    lsp_zero.default_setup,
-    lua_ls = function()
-      local lua_opts = lsp_zero.nvim_lua_ls()
-
-      require('lspconfig').lua_ls.setup(lua_opts)
-    end,
-
-    terraformls = function()
-        require('lspconfig').terraformls.setup({})
-    end,
-
-    tflint = function ()
-        require('lspconfig').tflint.setup({})
-    end
-
-  }
-})
+require('plugins')
 
 require("lspconfig").pyright.setup({})
 
@@ -334,7 +348,9 @@ local formatters = require("format-on-save.formatters")
 
 format_on_save.setup({
     formatter_by_ft = {
-        terraform = formatters.lsp
+        terraform = formatters.lsp,
+        go = formatters.lsp,
+        
     }
 })
 
@@ -345,4 +361,5 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
 
