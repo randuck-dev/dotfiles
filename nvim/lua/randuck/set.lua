@@ -20,7 +20,10 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 
 -- vim.opt.updatetime = 250
--- vim.opt.timeoutlen = 300
+--
+-- Decrease mapped sequence wait time
+-- Displays which-key popup sooner
+vim.opt.timeoutlen = 300
 
 vim.g.have_nerd_font = true
 
@@ -33,3 +36,5 @@ vim.opt.inccommand = 'split'
 
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+
