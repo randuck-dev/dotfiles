@@ -105,7 +105,7 @@ require('lazy').setup({
 		config = function ()
 			local configs = require("nvim-treesitter.configs")
 			configs.setup({
-				ensure_installed = { "go", "lua", "vim", "markdown", "markdown_inline", "hcl"},
+				ensure_installed = { "go", "lua", "vim", "markdown", "markdown_inline", "hcl", "python"},
 				sync_install = false,
 				higlight = {enable = true},
 				indent = {enable = true},
@@ -134,6 +134,8 @@ require('lazy').setup({
         end
       end
     })
+
+
 	end},
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
 
