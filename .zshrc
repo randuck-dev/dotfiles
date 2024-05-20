@@ -89,6 +89,8 @@ export PATH=$PATH:$HOME/.local/bin
 # custom binaries
 export PATH=$PATH:$HOME/bin
 
+export PATH=$PATH:/opt/nvim-linux64/bin
+
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles"
 
