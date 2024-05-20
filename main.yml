@@ -85,15 +85,36 @@
         become: False
         when: oh_my_zsh.stat.exists == False
 
+      - name: "Check if installed zsh-autoggestions"
+        stat:
+          path: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+        register: zsh_autosuggestions 
+        become: False
+
+      - name: "Install zsh-autosuggestions"
+        shell:
+          cmd: git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+        become: False
+        when: zsh_autosuggestions.stat.exists == False
+
       - name: "Change to zsh shell"
         user:
           name: "{{ ansible_user_id }}"
           shell: /bin/zsh
 
+
+      - name: "Check if installed neovim"
+        shell:
+          cmd: nvim --version
+        register: neovim_version
+        failed_when: False
+        become: False
+
       - name: "Install neovim unstable"
         shell:
           cmd: sudo add-apt-repository ppa:neovim-ppa/unstable -y && sudo apt-get update && sudo apt-get install neovim -y
         become: "{{ should_become }}"
+        when: neovim_version.rc != 0
 
       - name: "Check go 1.21"
         shell:
