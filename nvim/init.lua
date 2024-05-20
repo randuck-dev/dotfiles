@@ -234,6 +234,7 @@ require('lazy').setup({
       require("copilot_cmp").setup()
     end
   },
+  { "terrortylor/nvim-comment"},
     {
           "folke/todo-comments.nvim",
           dependencies = { "nvim-lua/plenary.nvim" },
@@ -352,6 +353,7 @@ format_on_save.setup({
     formatter_by_ft = {
         terraform = formatters.lsp,
         go = formatters.lsp,
+        rust = formatters.lsp
         
     }
 })
@@ -364,4 +366,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+
+
+require('nvim_comment').setup()
 
