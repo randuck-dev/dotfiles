@@ -112,6 +112,12 @@ require('lazy').setup({
 			})
 		end
 	},
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
 
 	{'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
 	{'williamboman/mason.nvim'},
@@ -369,4 +375,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 
 require('nvim_comment').setup()
+require("oil").setup({
+  default_file_explorer = true,
+})
 
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
