@@ -55,6 +55,7 @@ require('lazy').setup({
 
       vim.keymap.set('n', "<leader>D", builtin.lsp_type_definitions, { desc = 'Go to Type [D]efinition' })
       vim.keymap.set('n', "<leader>ds", builtin.lsp_document_symbols, { desc = 'Go to [D]ocument [S]ymbols' })
+      vim.keymap.set('n', "<leader>ws", builtin.lsp_dynamic_workspace_symbols, { desc = 'Go to dynamic [W]orkspace [S]ymbols' })
 
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -105,7 +106,7 @@ require('lazy').setup({
 		config = function ()
 			local configs = require("nvim-treesitter.configs")
 			configs.setup({
-				ensure_installed = { "go", "lua", "vim", "markdown", "markdown_inline", "hcl", "python"},
+				ensure_installed = { "go", "ocaml", "lua", "vim", "markdown", "markdown_inline", "hcl", "python", "gleam"},
 				sync_install = false,
 				higlight = {enable = true},
 				indent = {enable = true},
@@ -179,7 +180,10 @@ require('lazy').setup({
     },
   },
 
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000, 
+    init = function()
+    end
+  },
     { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
@@ -191,7 +195,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -322,6 +326,7 @@ require('lualine').setup {
 require('plugins')
 
 require("lspconfig").pyright.setup({})
+require("lspconfig").gleam.setup({})
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
@@ -346,7 +351,7 @@ cmp.setup({
     }
 })
 
-vim.cmd [[ colorscheme tokyonight ]]
+vim.cmd [[ colorscheme catppuccin-latte]]
 
 
 require("ibl").setup()
