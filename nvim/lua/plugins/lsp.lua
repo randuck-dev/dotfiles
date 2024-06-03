@@ -38,10 +38,5 @@ require('mason-lspconfig').setup({
         file_types = {'go', 'gomod'}
       })
     end,
-
-    ocaml_lsp = function()
-      require('lspconfig').ocaml_lsp.setup({})
-    end,
-
   }
 })
