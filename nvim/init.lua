@@ -327,6 +327,7 @@ require('plugins')
 
 require("lspconfig").pyright.setup({})
 require("lspconfig").gleam.setup({})
+require("lspconfig").ocamllsp.setup({})
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
