@@ -106,7 +106,7 @@ require('lazy').setup({
 		config = function ()
 			local configs = require("nvim-treesitter.configs")
 			configs.setup({
-				ensure_installed = { "go", "ocaml", "lua", "vim", "markdown", "markdown_inline", "hcl", "python", "gleam"},
+				ensure_installed = { "go", "ocaml", "lua", "vim", "markdown", "markdown_inline", "hcl", "python", "gleam", "elixir"},
 				sync_install = false,
 				higlight = {enable = true},
 				indent = {enable = true},
@@ -316,7 +316,7 @@ pcall(require('telescope').load_extension, 'fzf')
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'catppuccin',
+    theme = 'catppuccin-frappe',
     component_separators = '|',
     section_separators = '',
   },
@@ -352,7 +352,7 @@ cmp.setup({
     }
 })
 
-vim.cmd [[ colorscheme catppuccin-latte]]
+vim.cmd [[ colorscheme catppuccin-frappe]]
 
 
 require("ibl").setup()

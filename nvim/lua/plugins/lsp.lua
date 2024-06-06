@@ -12,7 +12,7 @@ end)
 -- to learn how to use mason.nvim with lsp-zero
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright", "terraformls", "tflint", "gopls", "golangci_lint_ls"},
+  ensure_installed = {"lua_ls", "marksman", "rust_analyzer", "pyright", "terraformls", "tflint", "gopls", "golangci_lint_ls", "elixirls"},
   handlers = {
     lsp_zero.default_setup,
     lua_ls = function()
