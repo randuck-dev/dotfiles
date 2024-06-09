@@ -316,7 +316,7 @@ pcall(require('telescope').load_extension, 'fzf')
 require('lualine').setup {
   options = {
     icons_enabled = false,
-    theme = 'catppuccin-frappe',
+    theme = 'catppuccin-latte',
     component_separators = '|',
     section_separators = '',
   },
@@ -352,7 +352,7 @@ cmp.setup({
     }
 })
 
-vim.cmd [[ colorscheme catppuccin-frappe]]
+vim.cmd [[ colorscheme catppuccin-latte]]
 
 
 require("ibl").setup()
