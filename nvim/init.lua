@@ -304,6 +304,10 @@ vim.keymap.set('n', '<Space>', "<Nop>", opts)
 -- Terraform Shortcuts Begin
 vim.keymap.set('n', '<leader>ti', ":!terraform -chdir=%:p:h init<CR>", opts)
 vim.keymap.set('n', '<leader>tp', ":!terraform -chdir=%:p:h plan<CR>", opts)
+
+vim.keymap.set('n', '<leader>rp', ":sp <CR> :term python3 % <CR>", vim.tbl_extend("keep", opts, { desc = '[R]un [P]ython script'}))
+vim.keymap.set('n', '<leader>x', ":bd <CR> ", vim.tbl_extend("keep", opts, { desc = 'Close'}))
+
 vim.keymap.set('i', '<S-Tab>', '<C-d>', {})
 
 
@@ -352,7 +356,7 @@ cmp.setup({
     }
 })
 
-vim.cmd [[ colorscheme catppuccin-frappe]]
+vim.cmd [[ colorscheme catppuccin-frappe ]]
 
 
 require("ibl").setup()
@@ -386,3 +390,4 @@ require("oil").setup({
 })
 
 vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
