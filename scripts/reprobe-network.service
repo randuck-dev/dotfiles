@@ -1,0 +1,11 @@
+[Unit]
+Description=Reboot Network USB
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/reboot-network.sh
+Type=oneshot
+RemainAfterExit=true
+
+[Install]
+WantedBy=default.target
