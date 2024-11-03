@@ -29,6 +29,7 @@
         loop: 
           - visual-studio-code
           - alacritty
+          - nikitabobko/tap/aerospace
 
       - name: "Install deps"
         community.general.homebrew:
