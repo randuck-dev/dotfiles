@@ -9,14 +9,6 @@ SSH_DIR="$HOME/.ssh"
 
 ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 
-if ! [ -d $NVIM_DIR ]; then
-    echo "nvim dir does not exist linking it"
-    ln -sf $DOTFILES_DIR/nvim $HOME/.config/
-else
-    echo "not linking nvim dir, since it already exists"
-fi
-
-
 echo "Applying OS specific scripts"
 for file in $DOTFILES_DIR/os.d/*.sh; do
     echo "> $file"
