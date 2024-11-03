@@ -79,6 +79,7 @@ source $ZSH/oh-my-zsh.sh
 
 # golang
 export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:$HOME/go/bin
 
 # rust
 export PATH=$PATH:$HOME/.cargo/bin
