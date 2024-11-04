@@ -1,0 +1,37 @@
+let mapleader = " "
+
+
+" --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
+
+
+" Highlight copied text
+Plug 'machakann/vim-highlightedyank'
+" Commentary plugin
+Plug 'tpope/vim-commentary'
+Plug 'easymotion/vim-easymotion'
+Plug 'preservim/nerdtree'
+
+set easymotion
+set showmode
+set so=5
+set incsearch
+set nu
+set NERDTree
+
+# actions
+
+map s <Plug>(easymotion-s)
+
+map <leader>t <Action>(GotoFile)
+map <leader>< <Action>(FileStructurePopup)
+map <leader>r <Action>(RenameElement)
+map <leader>o <Action>(RiderManageRecentProjects)
+
+map <leader>sl <Action>(MoveTabRight)
+map <leader>l <Action>(NextSplitter)
+map <leader>h <Action>(PrevSplitter)
+map <leader>w <Action>(CloseContent)
+
+
+map <leader>e :NERDTreeToggle<CR>
+map <leader>sr <Action>(ReplaceInPath)
