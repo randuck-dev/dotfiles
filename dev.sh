@@ -11,10 +11,9 @@ ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 
 echo "Applying OS specific scripts"
 for file in $DOTFILES_DIR/os.d/*.sh; do
-    echo "> $file"
-    source $file
+  echo "> $file"
+  source $file
 done
-
 
 echo "Linking configuration files"
 for dir in $DOTFILES_DIR/config/*; do
@@ -26,14 +25,17 @@ for dir in $DOTFILES_DIR/config/*; do
 done
 echo "Finished linking configuration files"
 
+if [ ! -f "$HOME/.ideavimrc" ]; then
+  echo "Linking .ideavimrc"
+  ln -sf "$DOTFILES_DIR/.ideavimrc" "$HOME/.ideavimrc"
+fi
 
 echo "Applying shared scripts"
 for sharedFile in $DOTFILES_DIR/shared.d/*.sh; do
-    echo "> $sharedFile"
-    source $sharedFile
+  echo "> $sharedFile"
+  source $sharedFile
 done
 echo "Finished applying shared scripts"
 
 echo "Applying ansible playbook"
-ansible-playbook "$DOTFILES_DIR/main.yml" --ask-become-pass
-
+# ansible-playbook "$DOTFILES_DIR/main.yml" --ask-become-pass
