@@ -32,6 +32,8 @@ map <leader>l <Action>(NextSplitter)
 map <leader>h <Action>(PrevSplitter)
 map <leader>w <Action>(CloseContent)
 
+map <c-l> <Action>(NextSplitter)
 
-map <leader>e :NERDTreeToggle<CR>
+
+map <leader>e :NERDTreeFocus<CR>
 map <leader>sr <Action>(ReplaceInPath)
