@@ -38,4 +38,4 @@ done
 echo "Finished applying shared scripts"
 
 echo "Applying ansible playbook"
-# ansible-playbook "$DOTFILES_DIR/main.yml" --ask-become-pass
+ansible-playbook "$DOTFILES_DIR/main.yml" --ask-become-pass
