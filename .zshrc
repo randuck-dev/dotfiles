@@ -80,6 +80,7 @@ source $ZSH/oh-my-zsh.sh
 # golang
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
+export PATH=/opt/homebrew/bin:$PATH
 
 # rust
 export PATH=$PATH:$HOME/.cargo/bin
