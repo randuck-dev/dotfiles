@@ -32,5 +32,5 @@ else
     echo "alacritty themes found"
 fi
 
-ln -sf "$DOTFILES_DIR/alacritty.yml" "$ALACRITTY_DIR/alacritty.yml"
+ln -sf "$DOTFILES_DIR/alacritty.toml" "$ALACRITTY_DIR/alacritty.toml"
 
