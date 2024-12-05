@@ -84,7 +84,7 @@ export NVM_DIR="$HOME/.nvm"
       };
 
       window = {
-        opacity = 1.0;
+        opacity = 0.9;
         blur = true;
         decorations = "buttonless";
         padding = {

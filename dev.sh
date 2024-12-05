@@ -7,8 +7,6 @@ NVIM_DIR="$HOME/.config/nvim"
 TMUX_PLUGIN_DIR="$HOME/.tmux/plugins"
 SSH_DIR="$HOME/.ssh"
 
-ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
-
 echo "Applying OS specific scripts"
 for file in $DOTFILES_DIR/os.d/*.sh; do
   echo "> $file"
