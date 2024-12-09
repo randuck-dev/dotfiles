@@ -177,8 +177,8 @@ export NVM_DIR="$HOME/.nvm"
       bind-key v split-window -h -c "#{pane_current_path}"
       bind-key h split-window -v -c "#{pane_current_path}"
 
-      bind -n S-Left previous-window
-      bind -n S-Right next-window
+      bind -n C-h previous-window
+      bind -n C-l next-window
 
 
       bind-key g send-keys "source ~/.dotfiles/run.sh" Enter

@@ -6,4 +6,6 @@ shared-packages ++ [
   dockutil
   lazygit
   zsh-autosuggestions
+  gh
+  presenterm
 ]
