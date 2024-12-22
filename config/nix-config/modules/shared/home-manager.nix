@@ -8,11 +8,12 @@ let name = "Raphael Neumann";
   zsh = {
     enable = true;
     syntaxHighlighting.enable = true;
+    autosuggestion.enable = true;
     autocd = false;
 
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "zsh-autosuggestions" ];
+      plugins = [ "git" ];
       theme = "robbyrussell";
     };
 
@@ -31,6 +32,7 @@ alias ls='ls --color=auto'
 
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/.dotnet/tools
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.local/bin
@@ -46,6 +48,7 @@ alias dots="cd $HOME/.dotfiles"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+eval "$(direnv hook zsh)"
     '';
   };
 

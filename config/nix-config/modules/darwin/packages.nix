@@ -8,4 +8,9 @@ shared-packages ++ [
   zsh-autosuggestions
   gh
   presenterm
+  devenv
+  direnv
+  helix
+  git
+  nodejs
 ]
