@@ -5,4 +5,5 @@ _:
   "notion"
   "spotify"
   "dotnet-sdk@preview"
+  "ghostty"
 ]

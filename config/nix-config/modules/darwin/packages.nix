@@ -13,4 +13,9 @@ shared-packages ++ [
   helix
   git
   nodejs
+  just
+  k6
+  tokei
+  go
+  elixir
 ]
