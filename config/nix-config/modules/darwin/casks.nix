@@ -9,4 +9,5 @@ _:
   "rider"
   "visual-studio-code"
   "nikitabobko/tap/aerospace"
+  "microsoft-edge"
 ]
