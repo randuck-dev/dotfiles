@@ -142,6 +142,18 @@
         "type": "github"
       }
     },
+    "nikitabobko-homebrew-tap": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-ihT2PXLNVn7WKvEIPWBziPdwqQ2SNmSB0vhesTBCqx8=",
+        "type": "file",
+        "url": "https://github.com/nikitabobko/homebrew-tap.git"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/nikitabobko/homebrew-tap.git"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": "nixpkgs_2"
@@ -250,6 +262,7 @@
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "nikitabobko-homebrew-tap": "nikitabobko-homebrew-tap",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_4"
       }

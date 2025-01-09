@@ -6,4 +6,7 @@ _:
   "spotify"
   "dotnet-sdk@preview"
   "ghostty"
+  "rider"
+  "visual-studio-code"
+  "nikitabobko/tap/aerospace"
 ]

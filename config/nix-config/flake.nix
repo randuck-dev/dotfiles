@@ -27,9 +27,13 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nikitabobko-homebrew-tap = {
+      url = "https://github.com/nikitabobko/homebrew-tap.git";
+      flake = false;
+    };
   };
 
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, disko } @inputs:
+  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, disko, nikitabobko-homebrew-tap } @inputs:
     let
       user = "randuck-dev";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -91,6 +95,7 @@
                   "homebrew/homebrew-core" = homebrew-core;
                   "homebrew/homebrew-cask" = homebrew-cask;
                   "homebrew/homebrew-bundle" = homebrew-bundle;
+                  "nikitabobko/homebrew-tap" = nikitabobko-homebrew-tap;
                 };
                 mutableTaps = false;
                 autoMigrate = true;
