@@ -4,7 +4,4 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
   return
 fi
 
-ALACRITTY_DIR="$HOME/.config/alacritty"
-ALACRITTY_THEMES_DIR="$ALACRITTY_DIR/themes"
-
 echo "Running on mac"

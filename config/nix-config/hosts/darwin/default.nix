@@ -5,7 +5,7 @@ let user = "randuck-dev"; in
 {
   imports = [
     ../../modules/darwin/home-manager.nix
-    ../../modules/shared
+    ../../modules/darwin
   ];
 
   services.nix-daemon.enable = true;
@@ -33,7 +33,8 @@ let user = "randuck-dev"; in
   system.checks.verifyNixPath = false;
 
   environment.systemPackages = with pkgs; [
-  ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
+
+  ];
 
   system = {
     stateVersion = 4;
