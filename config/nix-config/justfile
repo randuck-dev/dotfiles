@@ -2,8 +2,8 @@
 
 build machine:
     echo "Starting build..."
-    nix build --extra-experimental-features 'nix-command flakes' .#darwinConfigurations.{{ machine }}.system
+    nix build --extra-experimental-features 'nix-command flakes' .#darwinConfigurations.{{ machine }}.system --show-trace
 
     ls ./result/sw/bin
-    unlink ./result
+    
 

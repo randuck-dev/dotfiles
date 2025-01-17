@@ -3,7 +3,7 @@
 let name = "Raphael Neumann";
     user = "randuck-dev";
     email = "mail@raphaelneumann.dk";
-    # additionalFiles = import ./files.nix { inherit user config pkgs; };
+    additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
   imports = [
