@@ -1,7 +1,9 @@
-{ user, name, email, config, pkgs, lib, home-manager, ... }:
+{ config, pkgs, lib, ... }:
 
-let 
-    additionalFiles = import ./files.nix { inherit user config pkgs; };
+let name = "Raphael Neumann";
+    user = "randuck-dev";
+    email = "mail@raphaelneumann.dk";
+    # additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
   imports = [

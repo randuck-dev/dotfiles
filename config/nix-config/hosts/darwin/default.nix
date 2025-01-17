@@ -1,12 +1,14 @@
-{ user, name, email, config, pkgs, lib, home-manager, ... }:
+{ config, pkgs, lib, ... }:
 
 let 
-  homeManagerConfig = import ../../modules/darwin/home-manager.nix { inherit user name email config pkgs lib home-manager; };
+  user = "randuck-dev"; 
+  name = "Raphael Neumann";
+  email = "mail@raphaelneumann.dk";
 in
 
 {
   imports = [
-    homeManagerConfig
+    ../../modules/darwin/home-manager.nix
     ../../modules/darwin
   ];
 

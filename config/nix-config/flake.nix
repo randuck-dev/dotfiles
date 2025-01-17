@@ -55,6 +55,7 @@
         inputs.darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs;
+          inputs = { inherit nixpkgs darwin; };
           modules = [
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
@@ -72,7 +73,8 @@
                 autoMigrate = true;
               };
             }
-          ] ++ extraDarwinModules;
+            ./hosts/darwin
+          ]; 
         };
     in
     {
@@ -81,7 +83,8 @@
         zeus = mkDarwin {
           system = "aarch64-darwin";
           user = "randuck-dev";
-          extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
+          # extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
+          extraDarwinModules = [  ];
         };
       };
     };
