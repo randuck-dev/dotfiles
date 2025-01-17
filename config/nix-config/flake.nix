@@ -1,5 +1,5 @@
 {
-  description = "Starter Configuration for MacOS and NixOS";
+  description = "Configuration for Mac OS Machines";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -34,9 +34,7 @@
   };
 
   outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, disko, nikitabobko-homebrew-tap } @inputs:
-    let
-      inherit (nixpkgs) lib;
-      darwinSystems = [ "aarch64-darwin" ];
+    let 
       mkApp = scriptName: system: {
         type = "app";
         program = "${(nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
@@ -53,14 +51,10 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      mkDarwin = {
-        system, 
-        user,
-        extraDarwinModules ? {},
-      }:
+      mkDarwin = { system, user, extraDarwinModules ? {} }:
         inputs.darwin.lib.darwinSystem {
           inherit system;
-          # specialArgs = {inherit self; };
+          specialArgs = inputs;
           modules = [
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
@@ -79,18 +73,16 @@
               };
             }
           ] ++ extraDarwinModules;
-      };
+        };
     in
     {
-      apps = nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
-
+      apps = nixpkgs.lib.genAttrs ["aarch64-darwin"] mkDarwinApps;
       darwinConfigurations = {
         zeus = mkDarwin {
-            system = "aarch64-darwin";
-            user = "randuck-dev";
-            extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
+          system = "aarch64-darwin";
+          user = "randuck-dev";
+          extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
         };
       };
-
-  };
+    };
 }
