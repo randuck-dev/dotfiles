@@ -29,7 +29,6 @@ in
     users.${user} = { pkgs, config, lib, ... }:{
       home = {
         enableNixpkgsReleaseCheck = false;
-        packages = pkgs.callPackage ./packages.nix {};
         stateVersion = "23.11";
       };
       programs = {
