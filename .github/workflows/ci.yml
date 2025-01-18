@@ -20,10 +20,6 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          ~/.cache/nix
-          ~/.local/state/nix
-          ~/.nix-defexpr
-          ~/.nix-profile
           /nix/store
         key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
 
@@ -36,9 +32,5 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          ~/.cache/nix
-          ~/.local/state/nix
-          ~/.nix-defexpr
-          ~/.nix-profile
           /nix/store
         key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
