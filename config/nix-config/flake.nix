@@ -51,7 +51,7 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      mkDarwin = { system, user, name, email, extraDarwinModules ? {} }:
+      mkDarwin = { system, user, name, email, extraCasks? [] }:
         inputs.darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs;
@@ -90,14 +90,12 @@
               homebrew = {
                 enable = true;
                 casks = [
-                  "notion"
-                  "spotify"
                   "ghostty"
                   "rider"
                   "visual-studio-code"
                   "nikitabobko/tap/aerospace"
                   "microsoft-edge"
-                ];
+                ] ++ extraCasks;
               };
             }
           ]; 
@@ -111,6 +109,10 @@
           user = "randuck-dev";
           name = "Raphael Neumann";
           email = "2768009+randuck-dev@users.noreply.github.com";
+          extraCasks = [
+            "notion"
+            "spotify"
+          ];
         };
       };
     };
