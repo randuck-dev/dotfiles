@@ -5,17 +5,14 @@ let
     email = config.gitEmail;
     user = config.username;
     # additionalFiles = import ./files.nix { inherit user config pkgs; };
-    zshConfig = import ../zsh { inherit config pkgs lib; };
-    sshConfig = import ../ssh { inherit config pkgs lib; };
-    tmuxConfig = import ../tmux { inherit config pkgs lib; };
 in
 {
   imports = [
    ./dock
    ../homebrew
-   tmuxConfig
-   sshConfig
-   zshConfig
+   ../ssh
+   ../zsh
+   ../tmux
   ];
 
   home-manager = {
