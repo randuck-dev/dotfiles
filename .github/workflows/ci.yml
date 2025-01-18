@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install nix
-      uses: DeterminateSystems/nix-installer-action@v12
+      uses: DeterminateSystems/nix-installer-action@v16
     - uses: extractions/setup-just@v2
 
     - name: Build
