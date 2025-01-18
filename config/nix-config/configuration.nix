@@ -7,4 +7,9 @@ with lib;
       type = types.str;
       description = "The username of the user";
   };
+  
+  options.gitEmail = mkOption {
+      type = types.str;
+      description = "The git email to use for the .gitconfig";
+  };
 }

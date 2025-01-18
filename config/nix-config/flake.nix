@@ -59,6 +59,7 @@
             ./configuration.nix
             {
               username = user;
+              gitEmail = email;
             }
             # We are importing the home-manager module
             home-manager.darwinModules.home-manager
@@ -109,7 +110,7 @@
           system = "aarch64-darwin";
           user = "randuck-dev";
           name = "Raphael Neumann";
-          email = "mail@raphaelneumann.dk";
+          email = "2768009+randuck-dev@users.noreply.github.com";
         };
       };
     };

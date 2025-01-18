@@ -2,7 +2,7 @@
 
 let 
     name = "Raphael Neumann";
-    email = "mail@raphaelneumann.dk";
+    email = config.gitEmail;
     user = config.username;
     # additionalFiles = import ./files.nix { inherit user config pkgs; };
     zshConfig = import ../zsh { inherit config pkgs lib; };
@@ -26,7 +26,24 @@ in
         stateVersion = "23.11";
       };
       programs = {
-        
+        git = {
+          enable = true;
+          ignores = [ "*.swp" ];
+          userName = name;
+          userEmail = email;
+          lfs = {
+            enable = true;
+          };
+          extraConfig = {
+            init.defaultBranch = "main";
+            core = {
+            editor = "vim";
+              autocrlf = "input";
+            };
+            pull.rebase = true;
+            rebase.autoStash = true;
+          };
+        };
       };
       manual.manpages.enable = false;
     };
