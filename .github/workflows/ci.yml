@@ -15,7 +15,34 @@ jobs:
     - name: Install nix
       uses: DeterminateSystems/nix-installer-action@v16
     - uses: extractions/setup-just@v2
+    - name: nix store cache
+      id: cache-nix-store
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.cache/devbox
+          ~/.cache/nix
+          ~/.local/state/nix
+          ~/.nix-defexpr
+          ~/.nix-profile
+          /nix/store
+          /nix/var/nix
+        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles(format('{0}/flake.lock', inputs.project-path)) }}
 
     - name: Build
       working-directory: ./config/nix-config
       run: just build zeus
+
+    - name: Save nix store cache
+      if: steps.cache-nix-store.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.cache/devbox
+          ~/.cache/nix
+          ~/.local/state/nix
+          ~/.nix-defexpr
+          ~/.nix-profile
+          /nix/store
+          /nix/var/nix
+        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles(format('{0}/flake.lock', inputs.project-path)) }}
