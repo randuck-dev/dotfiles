@@ -1,5 +1,12 @@
 { config, pkgs, lib, ... }:
 
+let
+  combinedDotnet = with pkgs; with dotnetCorePackages;
+    combinePackages [
+      sdk_8_0
+      sdk_9_0
+    ];
+in
 {
   imports = [
     ../../modules/darwin/home-manager.nix
@@ -36,9 +43,16 @@
     '';
   };
 
+  home-manager.users.${config.username}.programs.zsh.initExtra = ''
+      export ASPNETCORE_ENVIRONMENT="Development"
+      export DOTNET_ROOT="${combinedDotnet}/share/dotnet"
+      export DOTNET_HOST_PATH="${combinedDotnet}/dotnet"
+  '';
+
   system.checks.verifyNixPath = false;
 
   environment.systemPackages = with pkgs; [
+    combinedDotnet
   ] ++ (import ../../modules/darwin/packages.nix { inherit pkgs; });
 
   system = {
