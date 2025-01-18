@@ -20,13 +20,11 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          ~/.cache/devbox
           ~/.cache/nix
           ~/.local/state/nix
           ~/.nix-defexpr
           ~/.nix-profile
           /nix/store
-          /nix/var/nix
         key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
 
     - name: Build
@@ -38,11 +36,9 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: |
-          ~/.cache/devbox
           ~/.cache/nix
           ~/.local/state/nix
           ~/.nix-defexpr
           ~/.nix-profile
           /nix/store
-          /nix/var/nix
         key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
