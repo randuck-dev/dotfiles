@@ -51,12 +51,12 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      mkDarwin = { system, user, extraDarwinModules ? {} }:
+      mkDarwin = { system, user, name, email, extraDarwinModules ? {} }:
         inputs.darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs;
-          inputs = { inherit nixpkgs darwin; };
           modules = [
+            # We are importing the home-manager module
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
             {
@@ -74,6 +74,27 @@
               };
             }
             ./hosts/darwin
+            {
+              users.users.${user} = {
+                name = "${user}";
+                home = "/Users/${user}";
+                isHidden = false;
+                shell = nixpkgs.legacyPackages.${system}.zsh;
+              };
+
+              homebrew = {
+                enable = true;
+                casks = [
+                  "notion"
+                  "spotify"
+                  "ghostty"
+                  "rider"
+                  "visual-studio-code"
+                  "nikitabobko/tap/aerospace"
+                  "microsoft-edge"
+                ];
+              };
+            }
           ]; 
         };
     in
@@ -83,6 +104,8 @@
         zeus = mkDarwin {
           system = "aarch64-darwin";
           user = "randuck-dev";
+          name = "Raphael Neumann";
+          email = "mail@raphaelneumann.dk";
           # extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
           extraDarwinModules = [  ];
         };

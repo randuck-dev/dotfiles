@@ -3,32 +3,19 @@
 let name = "Raphael Neumann";
     user = "randuck-dev";
     email = "mail@raphaelneumann.dk";
-    additionalFiles = import ./files.nix { inherit user config pkgs; };
+    # additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
   imports = [
    ./dock
   ];
 
-  users.users.${user} = {
-    name = "${user}";
-    home = "/Users/${user}";
-    isHidden = false;
-    shell = pkgs.zsh;
-  };
-
-  homebrew = {
-    enable = true;
-    casks = pkgs.callPackage ./casks.nix {};
-    masApps = {
-    };
-  };
-
   home-manager = {
     useGlobalPkgs = true;
     users.${user} = { pkgs, config, lib, ... }:{
       home = {
         enableNixpkgsReleaseCheck = false;
+        packages = pkgs.callPackage ./packages.nix {};
         stateVersion = "23.11";
       };
       programs = {
@@ -79,24 +66,6 @@ in
           '';
         };
 
-        git = {
-          enable = true;
-          ignores = [ "*.swp" ];
-          userName = name;
-          userEmail = email;
-          lfs = {
-            enable = true;
-          };
-          extraConfig = {
-            init.defaultBranch = "main";
-            core = {
-            editor = "vim";
-              autocrlf = "input";
-            };
-            pull.rebase = true;
-            rebase.autoStash = true;
-          };
-        };
 
         vim = {
           enable = true;

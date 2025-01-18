@@ -9,8 +9,16 @@ in
 {
   imports = [
     ../../modules/darwin/home-manager.nix
-    ../../modules/darwin
   ];
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      allowBroken = true;
+      allowInsecure = false;
+      allowUnsupportedSystem = true;
+    };
+  };
 
   services.nix-daemon.enable = true;
 
