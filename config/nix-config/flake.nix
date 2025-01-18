@@ -28,7 +28,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nikitabobko-homebrew-tap = {
-      url = "https://github.com/nikitabobko/homebrew-tap.git";
+      url = "github:nikitabobko/homebrew-tap";
       flake = false;
     };
   };
