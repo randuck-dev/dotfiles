@@ -27,7 +27,7 @@ jobs:
           ~/.nix-profile
           /nix/store
           /nix/var/nix
-        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles(format('{0}/flake.lock', inputs.project-path)) }}
+        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
 
     - name: Build
       working-directory: ./config/nix-config
@@ -45,4 +45,4 @@ jobs:
           ~/.nix-profile
           /nix/store
           /nix/var/nix
-        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles(format('{0}/flake.lock', inputs.project-path)) }}
+        key: ${{ runner.os }}-${{ runner.arch }}-dotfiles-randuck-${{ hashFiles('./config/nix-config/flake.lock') }}
