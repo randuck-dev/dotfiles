@@ -12,6 +12,7 @@ in
 {
   imports = [
    ./dock
+   ../homebrew
    tmuxConfig
    sshConfig
    zshConfig

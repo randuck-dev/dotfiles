@@ -60,6 +60,7 @@
             {
               username = user;
               gitEmail = email;
+              extraCasks = extraCasks;
             }
             # We are importing the home-manager module
             home-manager.darwinModules.home-manager
@@ -85,17 +86,6 @@
                 home = "/Users/${user}";
                 isHidden = false;
                 shell = nixpkgs.legacyPackages.${system}.zsh;
-              };
-
-              homebrew = {
-                enable = true;
-                casks = [
-                  "ghostty"
-                  "rider"
-                  "visual-studio-code"
-                  "nikitabobko/tap/aerospace"
-                  "microsoft-edge"
-                ] ++ extraCasks;
               };
             }
           ]; 
