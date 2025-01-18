@@ -9,3 +9,6 @@ build machine:
 switch machine:
     darwin-rebuild switch --flake .#{{ machine }} --show-trace
 
+update:
+    nix flake update
+
