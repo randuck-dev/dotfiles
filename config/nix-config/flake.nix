@@ -56,6 +56,10 @@
           inherit system;
           specialArgs = inputs;
           modules = [
+            ./configuration.nix
+            {
+              username = user;
+            }
             # We are importing the home-manager module
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
@@ -106,8 +110,6 @@
           user = "randuck-dev";
           name = "Raphael Neumann";
           email = "mail@raphaelneumann.dk";
-          # extraDarwinModules = [ ./hosts/darwin/zeus.nix ];
-          extraDarwinModules = [  ];
         };
       };
     };
