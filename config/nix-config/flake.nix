@@ -1,5 +1,5 @@
 {
-  description = "Configuration for Mac OS Machines";
+  description = "Configuration for randuck-dev machines";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
