@@ -26,7 +26,6 @@ with pkgs;
   fzf
   unrar
   unzip
-  zsh-powerlevel10k
   zsh-autosuggestions
 
   oh-my-zsh

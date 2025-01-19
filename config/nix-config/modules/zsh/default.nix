@@ -5,7 +5,7 @@ in
   home-manager.users.${user}.programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;
-    autosuggestion.enable = true;
+    # autosuggestion.enable = true;
     autocd = false;
 
     oh-my-zsh = {
@@ -15,7 +15,6 @@ in
     };
 
     initExtraFirst = ''
-    # zmodload zsh/zprof
     '';
     initExtra = ''
 # ---- CUSTOM CODE ----
@@ -36,9 +35,6 @@ export PATH=$PATH:/opt/nvim-linux64/bin
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 eval "$(direnv hook zsh)"
 
 # ---- END CUSTOM CODE ----

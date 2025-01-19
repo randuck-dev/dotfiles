@@ -1,4 +1,5 @@
 
+set working-directory := 'config/nix-config'
 
 build machine:
     echo "Starting build..."
