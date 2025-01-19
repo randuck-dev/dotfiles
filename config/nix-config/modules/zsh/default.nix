@@ -2,7 +2,6 @@
 let user = config.username;
 in
 {
-
   home-manager.users.${user}.programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;
@@ -16,17 +15,11 @@ in
     };
 
     initExtraFirst = ''
-if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-fi
-
-# Always color ls and group directories
+    # zmodload zsh/zprof
+    '';
+    initExtra = ''
+# ---- CUSTOM CODE ----
 alias ls='ls --color=auto'
-
-# export ZSH="$HOME/.oh-my-zsh"
-
-#source $ZSH/oh-my-zsh.sh
 
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
@@ -47,6 +40,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 eval "$(direnv hook zsh)"
+
+# ---- END CUSTOM CODE ----
     '';
   };
 }
