@@ -22,18 +22,38 @@ set NERDTree
 
 map s <Plug>(easymotion-s)
 
+map <leader>f <Action>(SearchEverywhere)
 map <leader>t <Action>(GotoFile)
 map <leader>< <Action>(FileStructurePopup)
 map <leader>r <Action>(RenameElement)
 map <leader>o <Action>(RiderManageRecentProjects)
 
+map <leader>t <Action>(ActivateTerminalToolWindow)
+
 map <leader>sl <Action>(MoveTabRight)
 map <leader>l <Action>(NextSplitter)
 map <leader>h <Action>(PrevSplitter)
+
 map <leader>w <Action>(CloseContent)
+map <leader>b <Action>(ToggleLineBreakpoint)
+map <leader>dr <Action>(Debug)
+map <leader>dc <Action>(Resume)
+map <leader>ds <Action>(Stop)
 
-map <c-l> <Action>(NextSplitter)
-
+map <leader>n <Action>(NewElement)
 
 map <leader>e :NERDTreeFocus<CR>
 map <leader>sr <Action>(ReplaceInPath)
+
+nmap <leader>ff <Action>(GotoFile)
+nmap <leader>fs <Action>(FindInPath)
+nmap <leader>ft <Action>(TextSearchAction)
+nmap <leader>fd <Action>(GotoSymbol)
+
+nmap gr <Action>(FindUsages)
+
+
+nmap K <Action>(ShowErrorDescription)<Action>(QuickJavaDoc)
+
+nnoremap <leader>u :action FindUsages<CR>
+
