@@ -1,19 +1,32 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
-let user = "randuck-dev"; in
-
+let
+  combinedDotnet = with pkgs; with dotnetCorePackages;
+    combinePackages [
+      sdk_8_0
+      sdk_9_0
+    ];
+in
 {
   imports = [
     ../../modules/darwin/home-manager.nix
-    ../../modules/shared
   ];
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      allowBroken = true;
+      allowInsecure = false;
+      allowUnsupportedSystem = true;
+    };
+  };
 
   services.nix-daemon.enable = true;
 
   nix = {
     package = pkgs.nix;
     settings = {
-      trusted-users = [ "@admin" "${user}" ];
+      trusted-users = [ "@admin" "${config.username}" ];
       substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
       trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
     };
@@ -30,10 +43,17 @@ let user = "randuck-dev"; in
     '';
   };
 
+  home-manager.users.${config.username}.programs.zsh.initExtra = ''
+      export ASPNETCORE_ENVIRONMENT="Development"
+      export DOTNET_ROOT="${combinedDotnet}/share/dotnet"
+      export DOTNET_HOST_PATH="${combinedDotnet}/dotnet"
+  '';
+
   system.checks.verifyNixPath = false;
 
   environment.systemPackages = with pkgs; [
-  ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
+    combinedDotnet
+  ] ++ (import ../../modules/darwin/packages.nix { inherit pkgs; });
 
   system = {
     stateVersion = 4;

@@ -1,0 +1,14 @@
+
+
+build machine:
+    echo "Starting build..."
+    nix build --extra-experimental-features 'nix-command flakes' .#darwinConfigurations.{{ machine }}.system --show-trace
+    unlink ./result
+
+
+switch machine:
+    darwin-rebuild switch --flake .#{{ machine }} --show-trace
+
+update:
+    nix flake update
+

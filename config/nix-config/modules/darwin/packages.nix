@@ -1,8 +1,45 @@
 { pkgs }:
 
 with pkgs;
-let shared-packages = import ../shared/packages.nix { inherit pkgs; }; in
-shared-packages ++ [
+[
+  bash-completion
+  bat
+  btop
+  openssh
+  sqlite
+  wget
+  zip
+
+  docker
+  docker-compose
+
+  ffmpeg
+  fd
+  font-awesome
+
+  htop
+  jetbrains-mono
+  jq
+  ripgrep
+  tree
+  tmux
+  fzf
+  unrar
+  unzip
+  zsh-powerlevel10k
+  zsh-autosuggestions
+
+  oh-my-zsh
+
+  # Python packages
+  python3
+  virtualenv
+  
+  neovim
+
+  sesh
+  zoxide
+
   dockutil
   lazygit
   zsh-autosuggestions
@@ -18,8 +55,5 @@ shared-packages ++ [
   tokei
   go
   elixir
-  (with dotnetCorePackages; combinePackages [
-      sdk_8_0
-      sdk_9_0
-    ])
+  git-filter-repo
 ]

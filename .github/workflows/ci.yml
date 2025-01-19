@@ -1,0 +1,26 @@
+name: "darwin nix build"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - config/nix-config/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - config/nix-config/**
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install nix
+      uses: DeterminateSystems/nix-installer-action@v16
+    - uses: extractions/setup-just@v2
+
+    - name: Build
+      working-directory: ./config/nix-config
+      run: just build zeus
+
