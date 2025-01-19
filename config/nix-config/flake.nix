@@ -80,7 +80,7 @@
                 autoMigrate = true;
               };
             }
-            ./hosts/darwin
+            ./modules/darwin
             {
               users.users.${user} = {
                 name = "${user}";

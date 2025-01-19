@@ -9,7 +9,7 @@ let
 in
 {
   imports = [
-    ../../modules/darwin/home-manager.nix
+    ./home-manager.nix
   ];
 
   nixpkgs = {
@@ -72,11 +72,11 @@ in
       };
 
       dock = {
-        autohide = false;
+        autohide = true;
         show-recents = false;
         launchanim = true;
         orientation = "bottom";
-        tilesize = 48;
+        tilesize = 24;
       };
 
       finder = {

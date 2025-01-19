@@ -2,7 +2,6 @@
 
 let 
     user = config.username;
-    # additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
   imports = [
