@@ -60,6 +60,7 @@
             {
               username = user;
               gitEmail = email;
+              gitName = name;
               extraCasks = extraCasks;
             }
             # We are importing the home-manager module
