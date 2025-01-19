@@ -55,4 +55,5 @@ with pkgs;
   tokei
   go
   elixir
+  git-filter-repo
 ]
