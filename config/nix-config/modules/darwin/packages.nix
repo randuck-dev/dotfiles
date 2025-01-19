@@ -2,8 +2,6 @@
 
 with pkgs;
 [
-  aspell
-  aspellDicts.en
   bash-completion
   bat
   btop
@@ -12,23 +10,14 @@ with pkgs;
   wget
   zip
 
-  # Cloud-related tools and SDKs
   docker
   docker-compose
 
-  # Media-related packages
-  dejavu_fonts
   ffmpeg
   fd
   font-awesome
-  hack-font
-  noto-fonts
-  noto-fonts-emoji
-  meslo-lgs-nf
 
   htop
-  hunspell
-  iftop
   jetbrains-mono
   jq
   ripgrep
