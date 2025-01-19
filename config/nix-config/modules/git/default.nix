@@ -20,6 +20,8 @@ in
         autocrlf = "input";
       };
       pull.rebase = true;
+      pull.prune = true;
+      fetch.prune = true;
       rebase.autoStash = true;
     };
   };
