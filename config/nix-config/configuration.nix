@@ -17,4 +17,5 @@ with lib;
       type = types.str;
       description = "The name to use for the .gitconfig";
   };
+
 }

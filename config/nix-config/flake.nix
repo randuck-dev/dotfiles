@@ -51,7 +51,7 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      mkDarwin = { system, user, name, email, extraCasks? [] }:
+      mkDarwin = { system, user, name, email, extraCasks? [], extraPackages? [] }:
         inputs.darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs;
@@ -62,6 +62,7 @@
               gitEmail = email;
               gitName = name;
               extraCasks = extraCasks;
+              extraPackages = extraPackages;
             }
             # We are importing the home-manager module
             home-manager.darwinModules.home-manager

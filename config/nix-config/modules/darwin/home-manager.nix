@@ -19,7 +19,7 @@ in
       home = {
         enableNixpkgsReleaseCheck = false;
         packages = pkgs.callPackage ./packages.nix {};
-        stateVersion = "23.11";
+        stateVersion = "24.11";
       };
       manual.manpages.enable = false;
     };
