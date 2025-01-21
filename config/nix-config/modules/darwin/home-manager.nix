@@ -11,6 +11,7 @@ in
    ../zsh
    ../tmux
    ../git
+   ../azure
   ];
 
   home-manager = {

@@ -8,13 +8,6 @@ with lib;
     description = "Extra casks to install";
   };
 
-  options.extraPackages = mkOption {
-      type = types.listOf types.str;
-      default = [];
-      description = "A list of extra packages to install";
-  };
-
-
   config = {
     homebrew = {
       enable = true;
@@ -27,5 +20,4 @@ with lib;
       ] ++ config.extraCasks;
     };
   };
-
 }
