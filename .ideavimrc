@@ -44,6 +44,15 @@ nmap <leader>fd <Action>(GotoSymbol)
 
 nmap gr <Action>(FindUsages)
 
+nmap <leader>1 <Action>(SetHarpoon1)
+nmap <leader>2 <Action>(SetHarpoon2)
+nmap <leader>3 <Action>(SetHarpoon3)
+nmap <leader>4 <Action>(SetHarpoon4)
+
+nmap <C-1> <Action>(GotoHarpoon1)
+nmap <C-2> <Action>(GotoHarpoon2)
+nmap <C-3> <Action>(GotoHarpoon3)
+nmap <C-4> <Action>(GotoHarpoon4)
 
 nmap K <Action>(ShowErrorDescription)<Action>(QuickJavaDoc)
 
