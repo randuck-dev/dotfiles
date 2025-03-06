@@ -23,11 +23,11 @@ map <leader>o <Action>(RiderManageRecentProjects)
 map <leader>t <Action>(ActivateTerminalToolWindow)
 
 map <leader>sl <Action>(MoveTabRight)
-map <leader>l <Action>(NextSplitter)
-map <leader>h <Action>(PrevSplitter)
+map <leader>wd <Action>(CloseContent)
+map <leader>wl <Action>(NextSplitter)
+map <leader>wh <Action>(PrevSplitter)
 
-map <leader>w <Action>(CloseContent)
-map <leader>b <Action>(ToggleLineBreakpoint)
+map <leader>b <Action>(BuildSolutionAction)
 map <leader>dr <Action>(Debug)
 map <leader>dc <Action>(Resume)
 map <leader>ds <Action>(Stop)
@@ -37,8 +37,8 @@ map <leader>n <Action>(NewElement)
 map <leader>e :NERDTreeFocus<CR>
 map <leader>sr <Action>(ReplaceInPath)
 
-nmap <leader>ff <Action>(GotoFile)
-nmap <leader>fs <Action>(FindInPath)
+nmap <leader><leader> <Action>(GotoFile)
+nmap <leader>/ <Action>(FindInPath)
 nmap <leader>ft <Action>(TextSearchAction)
 nmap <leader>fd <Action>(GotoSymbol)
 
@@ -47,5 +47,8 @@ nmap gr <Action>(FindUsages)
 
 nmap K <Action>(ShowErrorDescription)<Action>(QuickJavaDoc)
 
-nnoremap <leader>u :action FindUsages<CR>
+nmap <leader>u :action FindUsages<CR>
+nmap <leader>l <Action>(NextTab)
+nmap <leader>h <Action>(PreviousTab)
 
+nmap <leader><Esc> <Action>(HideAllWindows)
