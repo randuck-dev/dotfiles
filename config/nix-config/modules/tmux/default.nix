@@ -79,12 +79,11 @@ in
 
       # Status Bar
       set -g status-justify centre
-      set -g status-bg black
       set -g status-fg colour35
       set -g status-interval 60
       set -g status-left-length 50
       set -g status-left "#[bg=colour105]💻#[fg=colour234,bold] #H#[bg=colour34]#[bg=colour105,nobold]#[fg=colour234] [#S] $tmux_target_lower"
-      set -g status-right '#[bg=colour105] 🕔 #[fg=colour234,bold]%H:%M '
+      set -g status-right '#(cd #{pane_current_path}; git rev-parse --abbrev-ref HEAD)'
 
 
       set -g default-terminal "xterm-256color"

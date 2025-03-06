@@ -1,12 +1,6 @@
 let mapleader = " "
 
-
-" --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
-
-
-" Highlight copied text
 Plug 'machakann/vim-highlightedyank'
-" Commentary plugin
 Plug 'tpope/vim-commentary'
 Plug 'easymotion/vim-easymotion'
 Plug 'preservim/nerdtree'
@@ -17,8 +11,6 @@ set so=5
 set incsearch
 set nu
 set NERDTree
-
-# actions
 
 map s <Plug>(easymotion-s)
 

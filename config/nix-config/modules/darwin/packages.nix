@@ -55,4 +55,6 @@ with pkgs;
   go
   elixir
   git-filter-repo
+  cargo
+  zig
 ]

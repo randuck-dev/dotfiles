@@ -5,14 +5,8 @@ in
   home-manager.users.${user}.programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;
-    # autosuggestion.enable = true;
+    autosuggestion.enable = true;
     autocd = false;
-
-    oh-my-zsh = {
-      enable = true;
-      plugins = [ "git" ];
-      theme = "robbyrussell";
-    };
 
     initExtraFirst = ''
     '';
