@@ -57,4 +57,5 @@ with pkgs;
   git-filter-repo
   cargo
   zig
+  azure-functions-core-tools
 ]
