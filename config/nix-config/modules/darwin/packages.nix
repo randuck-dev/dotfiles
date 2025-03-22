@@ -31,8 +31,6 @@ with pkgs;
   oh-my-zsh
 
   # Python packages
-  python3
-  virtualenv
   
   neovim
 

@@ -105,6 +105,9 @@
             "notion"
             "spotify"
           ];
+          config = {
+              azure.enable = true;
+            };
         };
       };
     };
