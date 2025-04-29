@@ -31,6 +31,9 @@ with pkgs;
   oh-my-zsh
 
   # Python packages
+  poetry
+  uv
+  
   
   neovim
 
