@@ -34,7 +34,7 @@ if true then return {
         config = true,
         cmd = "ToggleTerm",
         keys = {
-          { "<F4>", "<cmd>ToggleTerm<cr>", desc = "Toggle floating terminal" }
+          { "<leader>j", "<cmd>ToggleTerm<cr>", desc = "Toggle floating terminal" }
         },
         opts = {
           open_mapping = [[<F4>]],

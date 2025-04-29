@@ -26,6 +26,8 @@ export PATH=$PATH:$HOME/bin
 
 export PATH=$PATH:/opt/nvim-linux64/bin
 
+export PATH=/opt/homebrew/opt/python@3.12/libexec/bin:$PATH
+
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles"
 
