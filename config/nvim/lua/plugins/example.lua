@@ -1,6 +1,8 @@
 -- since this is just an example spec, don't actually load anything here and return an empty spec
 -- stylua: ignore
 if true then return {
+    {dir = "~/.config/nvim/local_plugins/notes"},
+    {dir = "~/.config/nvim/local_plugins/gh_fetcher"},
     {
       "catppuccin/nvim",
       name = "catppuccin"
