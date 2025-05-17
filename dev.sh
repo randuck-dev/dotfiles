@@ -15,6 +15,13 @@ log() {
   fi
 }
 
+if ! [ -x "$(command -v brew)" ]; then
+  echo "brew not found. Installing it..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+  echo "brew found"
+fi
+
 echo "Linking configuration files"
 for dir in $DOTFILES_DIR/config/*; do
   target_dir="$CONFIG_DIR/$(basename $dir)"
