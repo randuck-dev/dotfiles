@@ -6,12 +6,7 @@ in
 {
   imports = [
    ./dock
-   ../homebrew
    ../ssh
-   ../zsh
-   ../tmux
-   ../git
-   ../azure
   ];
 
   home-manager = {
@@ -32,6 +27,5 @@ in
     { path = "/Applications/Rider.app/"; }
     { path = "/Applications/Microsoft Edge.app/"; }
     { path = "/Applications/Visual Studio Code.app/"; }
-    { path = "/Applications/Notion.app/"; }
   ];
 }

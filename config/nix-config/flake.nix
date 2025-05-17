@@ -62,7 +62,6 @@
               username = user;
               gitEmail = email;
               gitName = name;
-              extraCasks = extraCasks;
             }
             # We are importing the home-manager module
             home-manager.darwinModules.home-manager
@@ -101,13 +100,6 @@
           user = "randuck-dev";
           name = "Raphael Neumann";
           email = "2768009+randuck-dev@users.noreply.github.com";
-          extraCasks = [
-            "notion"
-            "spotify"
-          ];
-          config = {
-              azure.enable = true;
-            };
         };
       };
     };
