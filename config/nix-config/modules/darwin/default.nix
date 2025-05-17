@@ -1,11 +1,6 @@
 { config, pkgs, lib, ... }:
 
 let
-  combinedDotnet = with pkgs; with dotnetCorePackages;
-    combinePackages [
-      sdk_8_0
-      sdk_9_0
-    ];
 in
 {
   nixpkgs = {
@@ -42,7 +37,6 @@ in
   system.checks.verifyNixPath = false;
 
   environment.systemPackages = with pkgs; [
-    combinedDotnet
   ] ++ (import ../../modules/darwin/packages.nix { inherit pkgs; });
 
   system = {

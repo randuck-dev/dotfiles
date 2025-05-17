@@ -29,7 +29,6 @@ export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.local/bin
 
-# custom binaries
 export PATH=$PATH:$HOME/bin
 
 export PATH=$PATH:/opt/nvim-linux64/bin
