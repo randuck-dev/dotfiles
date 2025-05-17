@@ -26,14 +26,15 @@ unsetopt EXTENDED_HISTORY
 unsetopt autocd
 
 export ASPNETCORE_ENVIRONMENT="Development"
-export DOTNET_ROOT="/nix/store/fq92my07v728cgnlvcq9q1wb43i20v4s-dotnet-wrapped-combined/share/dotnet"
-export DOTNET_HOST_PATH="/nix/store/fq92my07v728cgnlvcq9q1wb43i20v4s-dotnet-wrapped-combined/dotnet"
+export DOTNET_ROOT="$HOME/.dotnet"
+export DOTNET_HOST_PATH="$HOME/.dotnet"
 
 alias ls='ls --color=auto'
 
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.dotnet/tools
+export PATH=$PATH:$HOME/.dotnet
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.local/bin
