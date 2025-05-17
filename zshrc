@@ -1,3 +1,11 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
 HISTSIZE="10000"
 SAVEHIST="10000"
 
