@@ -3,37 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
-    home-manager.url = "github:nix-community/home-manager";
     darwin = {
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-    };
-    homebrew-bundle = {
-      url = "github:homebrew/homebrew-bundle";
-      flake = false;
-    };
-    homebrew-core = {
-      url = "github:homebrew/homebrew-core";
-      flake = false;
-    };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
     };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nikitabobko-homebrew-tap = {
-      url = "github:nikitabobko/homebrew-tap";
-      flake = false;
-    };
   };
 
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, disko, nikitabobko-homebrew-tap } @inputs:
+  outputs = { self, darwin, nixpkgs, disko } @inputs:
     let 
       mkApp = scriptName: system: {
         type = "app";
@@ -60,25 +40,6 @@
             config
             {
               username = user;
-              gitEmail = email;
-              gitName = name;
-            }
-            # We are importing the home-manager module
-            home-manager.darwinModules.home-manager
-            nix-homebrew.darwinModules.nix-homebrew
-            {
-              nix-homebrew = {
-                inherit user;
-                enable = true;
-                taps = {
-                  "homebrew/homebrew-core" = homebrew-core;
-                  "homebrew/homebrew-cask" = homebrew-cask;
-                  "homebrew/homebrew-bundle" = homebrew-bundle;
-                  "nikitabobko/homebrew-tap" = nikitabobko-homebrew-tap;
-                };
-                mutableTaps = false;
-                autoMigrate = true;
-              };
             }
             ./modules/darwin
             {

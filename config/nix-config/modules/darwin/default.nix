@@ -8,10 +8,6 @@ let
     ];
 in
 {
-  imports = [
-    ./home-manager.nix
-  ];
-
   nixpkgs = {
     config = {
       allowUnfree = true;
@@ -42,12 +38,6 @@ in
   };
 
   ids.gids.nixbld = 350;
-
-  home-manager.users.${config.username}.programs.zsh.initExtra = ''
-      export ASPNETCORE_ENVIRONMENT="Development"
-      export DOTNET_ROOT="${combinedDotnet}/share/dotnet"
-      export DOTNET_HOST_PATH="${combinedDotnet}/dotnet"
-  '';
 
   system.checks.verifyNixPath = false;
 
