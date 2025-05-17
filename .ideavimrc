@@ -1,17 +1,15 @@
 let mapleader = " "
 
-Plug 'machakann/vim-highlightedyank'
-Plug 'tpope/vim-commentary'
-Plug 'easymotion/vim-easymotion'
-Plug 'preservim/nerdtree'
 
 set easymotion
+
 set showmode
 set so=5
 set incsearch
 set nu
 set NERDTree
 
+let g:EasyMotion_do_mapping = 0
 map s <Plug>(easymotion-s)
 
 map <leader>f <Action>(SearchEverywhere)
@@ -41,8 +39,10 @@ nmap <leader><leader> <Action>(GotoFile)
 nmap <leader>/ <Action>(FindInPath)
 nmap <leader>ft <Action>(TextSearchAction)
 nmap <leader>fd <Action>(GotoSymbol)
+nmap <leader>ff <Action>(SelectInProjectView)
 
 nmap gr <Action>(FindUsages)
+nmap gi <Action>(ResharperGotoImplementation)
 
 nmap <leader>1 <Action>(SetHarpoon1)
 nmap <leader>2 <Action>(SetHarpoon2)
@@ -54,10 +54,13 @@ nmap <C-2> <Action>(GotoHarpoon2)
 nmap <C-3> <Action>(GotoHarpoon3)
 nmap <C-4> <Action>(GotoHarpoon4)
 
+nmap <C-l> <Action>(CommentByLineComment)
+vmap <C-l> <Action>(CommentByLineComment)
+
 nmap K <Action>(ShowErrorDescription)<Action>(QuickJavaDoc)
 
 nmap <leader>u :action FindUsages<CR>
-nmap <leader>l <Action>(NextTab)
-nmap <leader>h <Action>(PreviousTab)
+nmap <S-l> <Action>(NextTab)
+nmap <S-h> <Action>(PreviousTab)
 
 nmap <leader><Esc> <Action>(HideAllWindows)
