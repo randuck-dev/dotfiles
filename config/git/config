@@ -1,0 +1,26 @@
+[core]
+	autocrlf = "input"
+	editor = "vim"
+
+[fetch]
+	prune = true
+
+[filter "lfs"]
+	clean = "git-lfs clean -- %f"
+	process = "git-lfs filter-process"
+	required = true
+	smudge = "git-lfs smudge -- %f"
+
+[init]
+	defaultBranch = "main"
+
+[pull]
+	prune = true
+	rebase = true
+
+[rebase]
+	autoStash = true
+
+[user]
+	email = "2768009+randuck-dev@users.noreply.github.com"
+	name = "Raphael Neumann"

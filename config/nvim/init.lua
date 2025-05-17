@@ -6,7 +6,9 @@ function hyperset(mode, binding, cmd)
   set(mode, "<F18>" .. binding, cmd)
 end
 
-vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
+set("t", "<esc><esc>", "<c-\\><c-n>")
+
+set("n", "<C-t>", "<cmd>!tmux neww ~/.dotfiles/tmux-sessionizer.sh<CR>", { desc = "Run sessionizer" })
 
 set("n", "<leader><leader>x", "<cmd>source %<CR>", {
   desc = "Execute the current file",
