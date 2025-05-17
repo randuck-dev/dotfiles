@@ -48,6 +48,5 @@ alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles ; nvim ."
 
 
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/randuck-dev/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+# Rancher Desktop
+export PATH="$HOME/.rd/bin:$PATH"
