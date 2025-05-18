@@ -11,7 +11,6 @@ return {
         adapters = {
           require("neotest-python")({
             runner = "pytest",
-            python = ".venv/bin/ptyhon",
           }),
         },
       })
