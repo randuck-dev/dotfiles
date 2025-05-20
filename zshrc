@@ -47,6 +47,9 @@ export PATH=/opt/homebrew/opt/python@3.12/libexec/bin:$PATH
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles ; nvim ."
 
-
 # Rancher Desktop
 export PATH="$HOME/.rd/bin:$PATH"
+
+if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi

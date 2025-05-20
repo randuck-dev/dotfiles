@@ -1,1 +1,1 @@
-brew install python uv poetry
+brew install python uv poetry ruff
