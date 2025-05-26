@@ -38,6 +38,7 @@ export PATH=$PATH:$HOME/.dotnet
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/.custom-binaries
 
 export PATH=$PATH:$HOME/bin
 export PATH=$PATH:/opt/nvim-linux64/bin
@@ -50,3 +51,8 @@ alias dots="cd $HOME/.dotfiles ; nvim ."
 
 # Rancher Desktop
 export PATH="$HOME/.rd/bin:$PATH"
+# Load machine-specific settings
+MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
+if [[ -f "$MACHINE_SPECIFIC_RC" ]]; then
+    source "$MACHINE_SPECIFIC_RC"
+fi
