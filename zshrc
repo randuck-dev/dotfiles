@@ -28,6 +28,8 @@ unsetopt autocd
 export ASPNETCORE_ENVIRONMENT="Development"
 export DOTNET_ROOT="$HOME/.dotnet"
 export DOTNET_HOST_PATH="$HOME/.dotnet"
+export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT=1
+
 
 alias ls='ls --color=auto'
 

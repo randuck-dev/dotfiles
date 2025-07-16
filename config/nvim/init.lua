@@ -17,3 +17,5 @@ set("n", "<leader><leader>x", "<cmd>source %<CR>", {
     print("Sourced: " .. currentFile)
   end,
 })
+
+vim.lsp.enable("gh_actions_ls")
