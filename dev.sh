@@ -20,10 +20,16 @@ log() {
 if ! [ -x "$(command -v brew)" ]; then
   echo "brew not found. Installing it..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  # Add brew to PATH after installation
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -f "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 else
   echo "brew found"
 fi
-
 echo "Linking configuration files"
 mkdir -p "$CONFIG_DIR"
 
