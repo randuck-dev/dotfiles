@@ -63,3 +63,14 @@ for s in $runs_dir; do
     $s
   fi
 done
+
+if [ -f "$HOME/.zshrc.pre-oh-my-zsh" ]; then
+  echo "Restoring original .zshrc from oh-my-zsh backup"
+  rm -f "$HOME/.zshrc"
+  mv "$HOME/.zshrc.pre-oh-my-zsh" "$HOME/.zshrc"
+fi
+
+if [ -n "$ZSH_VERSION" ]; then
+  echo "Reloading zsh configuration..."
+  source "$HOME/.zshrc"
+fi
