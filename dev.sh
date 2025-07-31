@@ -25,6 +25,8 @@ else
 fi
 
 echo "Linking configuration files"
+mkdir -p "$CONFIG_DIR"
+
 for dir in $DOTFILES_DIR/config/*; do
   target_dir="$CONFIG_DIR/$(basename $dir)"
   if [ ! -d $target_dir ]; then
