@@ -1,4 +1,4 @@
 font-family="JetBrains Mono"
 keybind = global:cmd+ctrl+l=toggle_quick_terminal
 
-theme = catppuccin-mocha
+# theme = catppuccin-mocha
