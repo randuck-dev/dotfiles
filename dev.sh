@@ -7,7 +7,6 @@ dry_run="0"
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$ZSH/custom"
 DOTFILES_DIR="$HOME/.dotfiles"
-CONFIG_DIR="$HOME/.config"
 
 log() {
   if [[ $dry_run == "1" ]]; then
@@ -30,19 +29,8 @@ if ! [ -x "$(command -v brew)" ]; then
 else
   echo "brew found"
 fi
-echo "Linking configuration files"
-mkdir -p "$CONFIG_DIR"
 
-for dir in $DOTFILES_DIR/config/*; do
-  target_dir="$CONFIG_DIR/$(basename $dir)"
-  if [ ! -d $target_dir ]; then
-    echo "> Creating symlink for $dir in $target_dir"
-    ln -sf $dir $target_dir
-  else
-    echo "> $target_dir already exists"
-  fi
-done
-echo "Finished linking configuration files"
+source ./config.sh
 
 if [ ! -f "$HOME/.ideavimrc" ]; then
   echo "Linking .ideavimrc"
