@@ -45,6 +45,7 @@ export PATH=$PATH:$HOME/.custom-binaries
 export PATH=$PATH:$HOME/bin
 export PATH=$PATH:/opt/nvim-linux64/bin
 export PATH=/opt/homebrew/opt/python@3.12/libexec/bin:$PATH
+export PATH=$PATH:$HOME/.dotfiles/bin
 
 
 alias bs="bash $HOME/.dotfiles/dev.sh"
@@ -57,4 +58,8 @@ export PATH="$HOME/.rd/bin:$PATH"
 MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
 if [[ -f "$MACHINE_SPECIFIC_RC" ]]; then
     source "$MACHINE_SPECIFIC_RC"
+fi
+
+if uwsm check may-start; then
+    exec uwsm start hyprland-uwsm.desktop
 fi
