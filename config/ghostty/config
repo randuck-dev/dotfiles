@@ -1,4 +1,10 @@
+font-size = 19
 font-family="JetBrains Mono"
 keybind = global:cmd+ctrl+l=toggle_quick_terminal
 
-theme = catppuccin-mocha
+theme = Catppuccin Mocha
+
+window-padding-x = 3,3
+window-padding-y = 3,3
+macos-titlebar-style = hidden
+window-decoration = none
