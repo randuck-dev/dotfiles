@@ -2,8 +2,7 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
-    ./disko.nix
+    /etc/nixos/hardware-configuration.nix
   ];
 
   # Bootloader
@@ -71,7 +70,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       # Terminal
-      kitty
+      kitty      
       
       # Wayland tools
       waybar
