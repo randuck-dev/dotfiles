@@ -9,6 +9,7 @@
   "modules-right": [
     "group/tray-expander",
     "bluetooth",
+    "cpu",
     "network",
     "pulseaudio",
     "/pu",
