@@ -139,6 +139,12 @@
     obsidian
     lazygit
     gh
+    pyright
+    ruff
+    omnisharp-roslyn
+    unzip
+    dotnetCorePackages.dotnet_9.sdk
+    nodejs_24
   ];
 
   fonts = {
