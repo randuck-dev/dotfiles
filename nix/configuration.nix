@@ -72,6 +72,8 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
+  programs.nix-ld.enable = true;
+
   programs.dconf.profiles.user = {
     databases = [{
       settings = {
@@ -145,6 +147,7 @@
     unzip
     dotnetCorePackages.dotnet_9.sdk
     nodejs_24
+    llvmPackages_21.libcxxClang
   ];
 
   fonts = {
