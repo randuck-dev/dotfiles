@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Get list of paired devices with connection status
+devices=$(bluetoothctl devices Paired | while read -r line; do
+  mac=$(echo "$line" | awk '{print $2}')
+  name=$(echo "$line" | awk '{print substr($0, index($0,$3))}')
+
+  # Check if connected
+  if bluetoothctl info "$mac" | grep -q "Connected: yes"; then
+    echo "✓ $name"
+  else
+    echo "  $name"
+  fi
+done)
+
+# Show devices in wofi
+chosen=$(echo "$devices" | wofi --dmenu -p "Bluetooth")
+
+# Exit if nothing selected
+if [ -z "$chosen" ]; then
+  exit 0
+fi
+
+# Remove the checkmark/spacing prefix
+device_name=$(echo "$chosen" | sed 's/^[✓ ]*//')
+
+# Get MAC address
+mac=$(bluetoothctl devices Paired | grep "$device_name" | awk '{print $2}')
+
+if [ -n "$mac" ]; then
+  # Check if device is connected
+  if bluetoothctl info "$mac" | grep -q "Connected: yes"; then
+    bluetoothctl disconnect "$mac"
+    notify-send "Bluetooth" "Disconnected from $device_name"
+  else
+    bluetoothctl connect "$mac"
+    notify-send "Bluetooth" "Connecting to $device_name..."
+  fi
+fi

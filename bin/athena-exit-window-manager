@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+choice=$(echo -e "Yes\nNo" | wofi --dmenu -p "Exit Hyprland?")
+if [ "$choice" = "Yes" ]; then
+  uwsm stop
+fi

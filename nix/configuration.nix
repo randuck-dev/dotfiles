@@ -11,7 +11,10 @@
   boot.kernelParams = [ "mem_sleep_default=deep" ];
   services.tlp.enable = true;
 
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+  };
   services.blueman.enable = true;
 
   virtualisation.docker.enable = true;
@@ -107,6 +110,7 @@
 
   services.pipewire = {
     enable = true;
+    wireplumber.enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
