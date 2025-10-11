@@ -8,6 +8,8 @@
   # Bootloader
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelParams = [ "mem_sleep_default=deep" ];
+  services.tlp.enable = true;
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
@@ -53,11 +55,26 @@
   # Open SSH port
   networking.firewall.allowedTCPPorts = [ 22 ];
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   # Enable Hyprland
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-    withUWSM = true;
+  };
+
+  programs.uwsm = {
+    enable = true;
+    waylandCompositors = {
+      hyprland = {
+        binPath = "/run/current-system/sw/bin/Hyprland";
+        comment = "Hyprland session managed by uwsm";
+        prettyName = "Hyprland";
+      };
+    };
   };
 
   programs.hyprlock.enable = true;
@@ -98,7 +115,7 @@
   users.users.randuck-dev = {
     isNormalUser = true;
     description = "Raphael Neumann";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" ];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
@@ -124,6 +141,8 @@
     neovim
     btop
 
+    libinput
+
     hyprpaper
     jq
     htop
@@ -134,6 +153,8 @@
     just
     terraform
     k9s
+
+    uwsm
 
     # apps
     microsoft-edge
@@ -148,6 +169,8 @@
     dotnetCorePackages.dotnet_9.sdk
     nodejs_24
     llvmPackages_21.libcxxClang
+    python314
+    brightnessctl
   ];
 
   fonts = {

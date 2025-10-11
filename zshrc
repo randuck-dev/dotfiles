@@ -56,10 +56,4 @@ alias dots="cd $HOME/.dotfiles ; nvim ."
 export PATH="$HOME/.rd/bin:$PATH"
 # Load machine-specific settings
 MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
-if [[ -f "$MACHINE_SPECIFIC_RC" ]]; then
-    source "$MACHINE_SPECIFIC_RC"
-fi
 
-if uwsm check may-start; then
-    exec uwsm start hyprland-uwsm.desktop
-fi

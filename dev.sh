@@ -28,6 +28,11 @@ if [ ! -f "$HOME/.zshrc" ]; then
   ln -sf "$DOTFILES_DIR/zshrc" "$HOME/.zshrc"
 fi
 
+if [ ! -f "$HOME/.zprofile" ]; then
+  echo "Linking .zprofile"
+  ln -sf "$DOTFILES_DIR/zprofile" "$HOME/.zprofile"
+fi
+
 if [ -f "$HOME/.zshrc.pre-oh-my-zsh" ]; then
   echo "Restoring original .zshrc from oh-my-zsh backup"
   rm -f "$HOME/.zshrc"

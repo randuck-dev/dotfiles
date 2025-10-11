@@ -19,3 +19,5 @@ shell-integration-features = no-cursor
 # Keyboard bindings
 keybind = f11=toggle_fullscreen
 keybind = global:cmd+ctrl+l=toggle_quick_terminal
+
+app-notifications = no-clipboard-copy
