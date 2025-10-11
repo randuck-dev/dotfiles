@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Check if YouTube Music is already running
+if hyprctl clients | grep -q -i "music.youtube.com"; then
+  # Focus the YouTube Music window
+  hyprctl dispatch focuswindow "class:msedge-music.youtube.com__-Default"
+else
+  # Launch YouTube Music
+  gtk-launch youtube-music
+fi
