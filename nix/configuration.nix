@@ -171,6 +171,17 @@
     llvmPackages_21.libcxxClang
     python314
     brightnessctl
+    playerctl
+    gtk3
+    (makeDesktopItem {
+      name = "youtube-music";
+      desktopName = "YouTube Music";
+      comment = "YouTube Music Web App";
+      exec = "${pkgs.microsoft-edge}/bin/microsoft-edge --app=https://music.youtube.com";
+      icon = "youtube-music";
+      categories = [ "AudioVideo" "Audio" "Player" ];
+      startupWMClass = "music.youtube.com";
+    })
   ];
 
   fonts = {
