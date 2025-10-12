@@ -1,5 +1,10 @@
 { config, pkgs, ... }:
 
+let
+  brightnessctl-rs = pkgs.callPackage (fetchTarball {
+    url = "https://github.com/randuck-dev/brightnessctl-rs/archive/refs/heads/main.zip";
+  }) {};
+in
 {
   imports = [
     /etc/nixos/hardware-configuration.nix
@@ -9,7 +14,13 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelParams = [ "mem_sleep_default=deep" ];
-  services.tlp.enable = true;
+  services.tlp = {
+    enable = true;
+    settings = {
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+    };
+  };
 
   hardware.bluetooth = {
       enable = true;
@@ -131,6 +142,14 @@
     shell = pkgs.zsh;
   };
 
+
+  security.wrappers.brightnessctl-rs = {
+    owner = "root";
+    group = "root";
+    capabilities = "cap_dac_override+ep";
+    source = "${brightnessctl-rs}/bin/brightnessctl-rs";
+  };
+
   # System packages
   environment.systemPackages = with pkgs; [
     wget
@@ -182,6 +201,7 @@
     llvmPackages_21.libcxxClang
     python314
     brightnessctl
+    brightnessctl-rs
     playerctl
     gtk3
     (makeDesktopItem {

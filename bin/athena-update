@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-sudo nixos-rebuild switch
+if sudo nixos-rebuild switch; then
+  GENERATION=$(nixos-rebuild list-generations --json | jq '.[0].generation')
+  notify-send "Update: Generation $GENERATION installed"
+else
+  notify-send -u critical "Update failed" "nixos-rebuild returned an error"
+fi

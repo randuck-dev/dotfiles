@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-brightnessctl set "$1"
+brightnessctl-rs set "$1"
 brightness=$(brightnessctl get)
 max_brightness=$(brightnessctl max)
 percent=$((brightness * 100 / max_brightness))
