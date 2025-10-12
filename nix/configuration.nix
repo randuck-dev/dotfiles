@@ -55,6 +55,13 @@
     };
   };
 
+  systemd.services.fprintd = {
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "simple";
+  };
+
+  services.fprintd.enable = true;
+
   # Open SSH port
   networking.firewall.allowedTCPPorts = [ 22 ];
 
@@ -119,7 +126,7 @@
   users.users.randuck-dev = {
     isNormalUser = true;
     description = "Raphael Neumann";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" ];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
