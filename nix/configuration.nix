@@ -1,9 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  brightnessctl-rs = pkgs.callPackage (fetchTarball {
-    url = "https://github.com/randuck-dev/brightnessctl-rs/archive/refs/heads/main.zip";
-  }) {};
+  brightnessctl-rs = pkgs.callPackage ./tools/brightnessctl-rs.nix { };
 in
 {
   imports = [
@@ -23,8 +21,8 @@ in
   };
 
   hardware.bluetooth = {
-      enable = true;
-      powerOnBoot = true;
+    enable = true;
+    powerOnBoot = true;
   };
   services.blueman.enable = true;
 
@@ -103,7 +101,7 @@ in
 
   # Required for Hyprland
   security.polkit.enable = true;
-  
+
   # XDG portal for screen sharing etc
   xdg.portal = {
     enable = true;
@@ -138,7 +136,7 @@ in
     isNormalUser = true;
     description = "Raphael Neumann";
     extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" ];
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 
@@ -162,7 +160,7 @@ in
     waybar
     wofi
     dunst
- 
+
     tmux
     # Utilities
     git
@@ -204,6 +202,15 @@ in
     brightnessctl-rs
     playerctl
     gtk3
+
+    # rust-env
+    rustc
+    cargo
+    rustfmt
+    rust-analyzer
+    clippy
+
+
     (makeDesktopItem {
       name = "youtube-music";
       desktopName = "YouTube Music";

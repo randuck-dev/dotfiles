@@ -57,3 +57,6 @@ export PATH="$HOME/.rd/bin:$PATH"
 # Load machine-specific settings
 MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
 
+if uwsm check may-start -q; then
+    exec uwsm start hyprland-uwsm.desktop
+fi
