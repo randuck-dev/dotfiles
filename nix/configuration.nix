@@ -5,7 +5,7 @@ let
 in
 {
   imports = [
-    /etc/nixos/hardware-configuration.nix
+    ./hardware-configuration.nix
   ];
 
   # Bootloader
@@ -245,6 +245,9 @@ in
   # Enable automatic login (optional, for VM convenience)
   # services.getty.autologinUser = "yourusername";
   nixpkgs.config.allowUnfree = true;
+
+  # Enable flakes and nix-command
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # This value determines the NixOS release compatibility
   system.stateVersion = "25.05";

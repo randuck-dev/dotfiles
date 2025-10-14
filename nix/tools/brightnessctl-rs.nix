@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs }:
 pkgs.callPackage
   (pkgs.fetchFromGitHub {
     owner = "randuck-dev";
