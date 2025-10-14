@@ -210,6 +210,8 @@ in
     rust-analyzer
     clippy
 
+    element-desktop
+
 
     (makeDesktopItem {
       name = "youtube-music";
