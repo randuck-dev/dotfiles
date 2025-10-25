@@ -48,6 +48,23 @@ if true then return {
         },
     },
   {
+    "seblyng/roslyn.nvim",
+    lazy = true,
+    opts ={}
+  },
+  {
+    "mason-org/mason.nvim",
+    lazy = true,
+    config = function()
+      require('mason').setup({
+        registries = {
+          'github:Crashdummyy/mason-registry',
+          'github:mason-org/mason-registry'
+        }
+      })
+    end
+  },
+  {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = "catppuccin-mocha",
