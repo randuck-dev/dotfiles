@@ -32,6 +32,16 @@ in
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
+  # In order for brightness control to work, this has to be setup like this.
+  # The alternative would be to use setuid on the brightnessctl-rs would be used,
+  # but that would provide to much access to the system
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="backlight", RUN+="${pkgs.coreutils}/bin/chgrp video /sys/class/backlight/%k/brightness"
+    ACTION=="add", SUBSYSTEM=="backlight", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/backlight/%k/brightness"
+    ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chgrp input /sys/class/leds/%k/brightness"
+    ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/leds/%k/brightness"
+  '';
+
   # Timezone and locale
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -140,14 +150,6 @@ in
     shell = pkgs.zsh;
   };
 
-
-  security.wrappers.brightnessctl-rs = {
-    owner = "root";
-    group = "root";
-    capabilities = "cap_dac_override+ep";
-    source = "${brightnessctl-rs}/bin/brightnessctl-rs";
-  };
-
   # System packages
   environment.systemPackages = with pkgs; [
     wget
@@ -211,6 +213,7 @@ in
     clippy
 
     element-desktop
+    protonvpn-gui
 
 
     (makeDesktopItem {
