@@ -53,6 +53,10 @@ local function get_latest_version(package)
     end
   end
 
+  table.sort(versionResults, function(a, b)
+    return a.version < b.version
+  end)
+
   return versionResults[#versionResults]
 end
 
