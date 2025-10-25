@@ -214,6 +214,7 @@ in
 
     element-desktop
     protonvpn-gui
+    roslyn-ls
 
 
     (makeDesktopItem {
