@@ -36,6 +36,11 @@ local function find_line_with_text(text)
   return nil -- Not found
 end
 
+local function version_to_number(version)
+  local major, minor, patch = version:match("(%d+)%.(%d+)%.(%d+)")
+  return tonumber(major) * 10000 + tonumber(minor) * 100 + tonumber(patch)
+end
+
 --- @param package Package
 --- @return VersionedPackage
 local function get_latest_version(package)
@@ -54,7 +59,7 @@ local function get_latest_version(package)
   end
 
   table.sort(versionResults, function(a, b)
-    return a.version < b.version
+    return version_to_number(a.version) < version_to_number(b.version)
   end)
 
   return versionResults[#versionResults]
