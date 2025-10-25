@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 dry_run="0"
 
 export ZSH="$HOME/.oh-my-zsh"
@@ -17,6 +16,7 @@ log() {
 }
 
 source ./config.sh
+source ./brew-deps.sh
 
 if [ ! -f "$HOME/.ideavimrc" ]; then
   echo "Linking .ideavimrc"
