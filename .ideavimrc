@@ -42,7 +42,7 @@ nmap <leader>fd <Action>(GotoSymbol)
 nmap <leader>ff <Action>(SelectInProjectView)
 
 nmap gr <Action>(FindUsages)
-nmap gi <Action>(ResharperGotoImplementation)
+nmap gi <Action>(ReSharperGotoImplementation)
 
 nmap <leader>1 <Action>(SetHarpoon1)
 nmap <leader>2 <Action>(SetHarpoon2)

@@ -1,11 +1,11 @@
-*/
+**
 
-!aerospace
+!aerospace/**
 !brightnessctl
 !ghostty
 !git
 !hypr
-!nvim
+!nvim/**
 !tmux
 !uwsm
 !waybar
