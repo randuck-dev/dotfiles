@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if sudo nixos-rebuild switch --flake ~/.dotfiles/#nixos; then
+  GENERATION=$(nixos-rebuild list-generations --json | jq '.[0].generation')
+  notify-send "Update: Generation $GENERATION installed"
+else
+  notify-send -u critical "Update failed" "nixos-rebuild returned an error"
+fi
