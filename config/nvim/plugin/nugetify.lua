@@ -1,5 +1,10 @@
 local M = {}
 
+local plenaryAsync = require("plenary.async")
+local plenaryJob = require("plenary.job")
+
+local sender, receiver = plenaryAsync.control.channel.mpsc()
+
 ---@class Package
 ---@field id string
 ---@field requestedVersion string?
@@ -22,10 +27,11 @@ function M.show_version_details_hint(namespace, bufnr, details)
   )
 end
 
+--- @param inputText string[]
 --- @param text string
 --- @return integer | nil
-local function find_line_with_text(text)
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+local function find_line_with_text(inputText, text)
+  local lines = inputText
 
   for i, line in ipairs(lines) do
     if line:match(text) then
@@ -36,33 +42,42 @@ local function find_line_with_text(text)
   return nil -- Not found
 end
 
+--- @param version string
 local function version_to_number(version)
+  --- @type string, string, string
   local major, minor, patch = version:match("(%d+)%.(%d+)%.(%d+)")
   return tonumber(major) * 10000 + tonumber(minor) * 100 + tonumber(patch)
 end
 
 --- @param package Package
+--- @param sender
 --- @return VersionedPackage
-local function get_latest_version(package)
-  local result = vim
-    .system({ "dotnet", "package", "search", "--exact-match", package.id, "--format", "json" }, { text = true })
-    :wait()
+local function get_latest_version(package, sender)
+  local result = vim.system(
+    { "dotnet", "package", "search", "--exact-match", package.id, "--format", "json" },
+    { text = true },
+    function(result)
+      local decoded = vim.json.decode(result.stdout)
 
-  local decoded = vim.json.decode(result.stdout)
+      --- @type VersionedPackage[]
+      local versionResults = {}
+      for _, searchResult in ipairs(decoded.searchResult or {}) do
+        for _, foundPackage in ipairs(searchResult.packages or {}) do
+          table.insert(versionResults, foundPackage)
+        end
+      end
 
-  --- @type VersionedPackage[]
-  local versionResults = {}
-  for _, searchResult in ipairs(decoded.searchResult or {}) do
-    for _, foundPackage in ipairs(searchResult.packages or {}) do
-      table.insert(versionResults, foundPackage)
+      --- we want to make sure that the version results are in descending order based on the semantic versioning
+      table.sort(versionResults, function(a, b)
+        return version_to_number(a.version) < version_to_number(b.version)
+      end)
+
+      sender.send({
+        package = package,
+        latestVersion = versionResults[#versionResults],
+      })
     end
-  end
-
-  table.sort(versionResults, function(a, b)
-    return version_to_number(a.version) < version_to_number(b.version)
-  end)
-
-  return versionResults[#versionResults]
+  )
 end
 
 --- @param executableName string
@@ -71,6 +86,43 @@ local function executableExists(executableName)
   vim.print(vim.inspect(result))
 
   return result.code == 0
+end
+
+--- @param wait_for_n integer
+--- @param receiver
+--- @param inputText string[]
+--- @param bufnr integer
+--- @param namespace integer
+local function consume_details(wait_for_n, receiver, inputText, bufnr, namespace)
+  local diagnosticDetails = {}
+  for _ = 1, wait_for_n do
+    local details = receiver.recv()
+    --- @type Package
+    local package = details.package
+    local line = find_line_with_text(inputText, package.id)
+    local severity = vim.diagnostic.severity.HINT
+
+    local text = string.format("✓ %s", package.requestedVersion)
+    --- @type VersionedPackage
+    local latestVersion = details.latestVersion
+
+    if latestVersion.version ~= package.requestedVersion then
+      text = string.format("↑: %s", latestVersion.version)
+      severity = vim.diagnostic.severity.WARN
+    end
+    local diagnostics = {
+      lnum = line - 1,
+      message = text,
+      severity = severity,
+      col = 0,
+    }
+
+    table.insert(diagnosticDetails, diagnostics)
+  end
+
+  vim.schedule(function()
+    M.show_version_details_hint(namespace, bufnr, diagnosticDetails)
+  end)
 end
 
 function M.fetch_version_details()
@@ -85,6 +137,7 @@ function M.fetch_version_details()
   local namespace = vim.api.nvim_create_namespace("nugetify-diagnostics")
   local executableName = "dotnet"
   local dotnetExists = executableExists(executableName)
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
   if not dotnetExists then
     vim.print("Dotnet does not exist. Skipping.")
@@ -92,48 +145,31 @@ function M.fetch_version_details()
   end
 
   vim.system({ "dotnet", "list", filepath, "package", "--format", "json" }, { text = true }, function(result)
-    local res = vim.split(result.stdout, "\n")
-
     --- we have to schedule this on the main event loop, since accessing certain internal vim details is not allowed on the fast event loop
-    vim.schedule(function()
-      if result.code == 0 then
-        local data = vim.json.decode(result.stdout)
+    if result.code == 0 then
+      local data = vim.json.decode(result.stdout)
 
-        --- @type Package[]
-        local packages = {}
-        for _, project in ipairs(data.projects or {}) do
-          for _, framework in ipairs(project.frameworks or {}) do
-            for _, pkg in ipairs(framework.topLevelPackages or {}) do
-              table.insert(packages, pkg)
-            end
+      --- @type Package[]
+      local packages = {}
+      for _, project in ipairs(data.projects or {}) do
+        for _, framework in ipairs(project.frameworks or {}) do
+          for _, pkg in ipairs(framework.topLevelPackages or {}) do
+            table.insert(packages, pkg)
           end
         end
-
-        local diagnosticDetails = {}
-
-        for _, package in ipairs(packages) do
-          local line = find_line_with_text(package.id)
-          local latestVersion = get_latest_version(package)
-          local severity = vim.diagnostic.severity.HINT
-
-          local text = string.format("✓ %s", package.requestedVersion)
-
-          if latestVersion.version ~= package.requestedVersion then
-            text = string.format("↑: %s", latestVersion.version)
-            severity = vim.diagnostic.severity.WARN
-          end
-          table.insert(diagnosticDetails, {
-            lnum = line - 1,
-            message = text,
-            severity = severity,
-            col = 0,
-          })
-        end
-        M.show_version_details_hint(namespace, bufnr, diagnosticDetails)
-      else
-        vim.notify("Error: " .. result.stderr, vim.log.levels.ERROR)
       end
-    end)
+
+      plenaryAsync.run(function()
+        consume_details(#packages, receiver, lines, bufnr, namespace)
+      end)
+
+      for _, package in ipairs(packages) do
+        vim.notify(vim.inspect(package))
+        get_latest_version(package, sender)
+      end
+    else
+      vim.notify("Error: " .. result.stderr, vim.log.levels.ERROR)
+    end
   end)
 end
 
