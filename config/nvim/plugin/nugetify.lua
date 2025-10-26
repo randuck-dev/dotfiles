@@ -83,8 +83,6 @@ end
 --- @param executableName string
 local function executableExists(executableName)
   local result = vim.system({ "which", executableName }, { text = true }):wait()
-  vim.print(vim.inspect(result))
-
   return result.code == 0
 end
 
@@ -164,7 +162,6 @@ function M.fetch_version_details()
       end)
 
       for _, package in ipairs(packages) do
-        vim.notify(vim.inspect(package))
         get_latest_version(package, sender)
       end
     else
