@@ -1,9 +1,7 @@
+local async = require("plenary.async")
+local job = require("plenary.job")
+
 local M = {}
-
-local plenaryAsync = require("plenary.async")
-local plenaryJob = require("plenary.job")
-
-local sender, receiver = plenaryAsync.control.channel.mpsc()
 
 ---@class Package
 ---@field id string
@@ -13,6 +11,10 @@ local sender, receiver = plenaryAsync.control.channel.mpsc()
 ---@class VersionedPackage
 ---@field id string
 ---@field version string
+
+---@class PackageDetails
+---@field package Package
+---@field latestVersion VersionedPackage
 
 --- @param namespace integer
 --- @param bufnr integer
@@ -51,9 +53,8 @@ end
 
 --- @param package Package
 --- @param sender
---- @return VersionedPackage
 local function get_latest_version(package, sender)
-  local result = vim.system(
+  vim.system(
     { "dotnet", "package", "search", "--exact-match", package.id, "--format", "json" },
     { text = true },
     function(result)
@@ -94,28 +95,38 @@ end
 local function consume_details(wait_for_n, receiver, inputText, bufnr, namespace)
   local diagnosticDetails = {}
   for _ = 1, wait_for_n do
-    local details = receiver.recv()
-    --- @type Package
-    local package = details.package
-    local line = find_line_with_text(inputText, package.id)
-    local severity = vim.diagnostic.severity.HINT
+    if not receiver then
+      vim.notify("receiver is null")
+    else
+      ---@type PackageDetails | nil
+      local details = receiver:recv()
+      if not details then
+        vim.notify("no details found")
+      else
+        local package = details.package
+        local line = find_line_with_text(inputText, package.id)
+        if not line then
+          return
+        end
+        local severity = vim.diagnostic.severity.HINT
 
-    local text = string.format("✓ %s", package.requestedVersion)
-    --- @type VersionedPackage
-    local latestVersion = details.latestVersion
+        local text = string.format("✓ %s", package.requestedVersion)
+        local latestVersion = details.latestVersion
 
-    if latestVersion.version ~= package.requestedVersion then
-      text = string.format("↑: %s", latestVersion.version)
-      severity = vim.diagnostic.severity.WARN
+        if latestVersion.version ~= package.requestedVersion then
+          text = string.format("↑: %s", latestVersion.version)
+          severity = vim.diagnostic.severity.WARN
+        end
+        local diagnostics = {
+          lnum = line - 1,
+          message = text,
+          severity = severity,
+          col = 0,
+        }
+
+        table.insert(diagnosticDetails, diagnostics)
+      end
     end
-    local diagnostics = {
-      lnum = line - 1,
-      message = text,
-      severity = severity,
-      col = 0,
-    }
-
-    table.insert(diagnosticDetails, diagnostics)
   end
 
   vim.schedule(function()
@@ -124,6 +135,7 @@ local function consume_details(wait_for_n, receiver, inputText, bufnr, namespace
 end
 
 function M.fetch_version_details()
+  local sender, receiver = async.control.channel.mpsc()
   local bufnr = vim.api.nvim_get_current_buf()
   local filepath = vim.api.nvim_buf_get_name(bufnr)
   local extension = vim.fn.fnamemodify(filepath, ":e")
@@ -143,7 +155,6 @@ function M.fetch_version_details()
   end
 
   vim.system({ "dotnet", "list", filepath, "package", "--format", "json" }, { text = true }, function(result)
-    --- we have to schedule this on the main event loop, since accessing certain internal vim details is not allowed on the fast event loop
     if result.code == 0 then
       local data = vim.json.decode(result.stdout)
 
@@ -157,9 +168,17 @@ function M.fetch_version_details()
         end
       end
 
-      plenaryAsync.run(function()
-        consume_details(#packages, receiver, lines, bufnr, namespace)
-      end)
+      async.run(function()
+        local ok, err = pcall(function()
+          consume_details(#packages, receiver, lines, bufnr, namespace)
+        end)
+
+        if not ok then
+          vim.schedule(function()
+            vim.notify("An error occured" .. tostring(err))
+          end)
+        end
+      end, function() end)
 
       for _, package in ipairs(packages) do
         get_latest_version(package, sender)
