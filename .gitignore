@@ -1,3 +1,17 @@
 
 result
 config/nix-config/result
+
+!config/
+config/*
+
+!config/nvim/
+!config/tmux
+!config/uwsm
+!config/waybar
+!config/wofi
+!config/aerospace/
+!config/brightnessctl/
+!config/ghostty
+!config/git/
+!config/hypr/
