@@ -1,7 +1,12 @@
 local async = require("plenary.async")
-local job = require("plenary.job")
 
 local M = {}
+
+---@class Receiver
+---@field recv function
+
+---@class Sender
+---@field send fun(value: any)
 
 ---@class Package
 ---@field id string
@@ -52,7 +57,7 @@ local function version_to_number(version)
 end
 
 --- @param package Package
---- @param sender
+--- @param sender Sender
 local function get_latest_version(package, sender)
   vim.system(
     { "dotnet", "package", "search", "--exact-match", package.id, "--format", "json" },
@@ -88,44 +93,40 @@ local function executableExists(executableName)
 end
 
 --- @param wait_for_n integer
---- @param receiver
+--- @param receiver Receiver
 --- @param inputText string[]
 --- @param bufnr integer
 --- @param namespace integer
 local function consume_details(wait_for_n, receiver, inputText, bufnr, namespace)
   local diagnosticDetails = {}
   for _ = 1, wait_for_n do
-    if not receiver then
-      vim.notify("receiver is null")
+    ---@type PackageDetails | nil
+    local details = receiver:recv()
+    if not details then
+      vim.notify("no details found")
     else
-      ---@type PackageDetails | nil
-      local details = receiver:recv()
-      if not details then
-        vim.notify("no details found")
-      else
-        local package = details.package
-        local line = find_line_with_text(inputText, package.id)
-        if not line then
-          return
-        end
-        local severity = vim.diagnostic.severity.HINT
-
-        local text = string.format("✓ %s", package.requestedVersion)
-        local latestVersion = details.latestVersion
-
-        if latestVersion.version ~= package.requestedVersion then
-          text = string.format("↑: %s", latestVersion.version)
-          severity = vim.diagnostic.severity.WARN
-        end
-        local diagnostics = {
-          lnum = line - 1,
-          message = text,
-          severity = severity,
-          col = 0,
-        }
-
-        table.insert(diagnosticDetails, diagnostics)
+      local package = details.package
+      local line = find_line_with_text(inputText, package.id)
+      if not line then
+        return
       end
+      local severity = vim.diagnostic.severity.HINT
+
+      local text = string.format("✓ %s", package.requestedVersion)
+      local latestVersion = details.latestVersion
+
+      if latestVersion.version ~= package.requestedVersion then
+        text = string.format("↑: %s", latestVersion.version)
+        severity = vim.diagnostic.severity.WARN
+      end
+      local diagnostics = {
+        lnum = line - 1,
+        message = text,
+        severity = severity,
+        col = 0,
+      }
+
+      table.insert(diagnosticDetails, diagnostics)
     end
   end
 
