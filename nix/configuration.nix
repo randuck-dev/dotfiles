@@ -46,25 +46,6 @@ in
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "da_DK.UTF-8";
-    LC_IDENTIFICATION = "da_DK.UTF-8";
-    LC_MEASUREMENT = "da_DK.UTF-8";
-    LC_MONETARY = "da_DK.UTF-8";
-    LC_NAME = "da_DK.UTF-8";
-    LC_NUMERIC = "da_DK.UTF-8";
-    LC_PAPER = "da_DK.UTF-8";
-    LC_TELEPHONE = "da_DK.UTF-8";
-    LC_TIME = "da_DK.UTF-8";
-  };
-
-  # Danish keyboard layout
-  services.xserver.xkb = {
-    layout = "dk";
-    variant = "";
-  };
-  console.keyMap = "dk-latin1";
-
   # Enable OpenSSH
   services.openssh = {
     enable = true;
@@ -81,8 +62,11 @@ in
 
   services.fprintd.enable = true;
 
-  # Open SSH port
-  networking.firewall.allowedTCPPorts = [ 22 ];
+  networking.firewall.allowedTCPPorts = [
+    22
+    1400
+    8123
+  ];
 
   programs.direnv = {
     enable = true;
@@ -118,7 +102,9 @@ in
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+  };
 
   programs.dconf.profiles.user = {
     databases = [{
@@ -134,6 +120,11 @@ in
   # Sound
   security.rtkit.enable = true;
 
+  services.udisks2 = {
+    enable = true;
+    mountOnMedia = true;
+  };
+
   services.pipewire = {
     enable = true;
     wireplumber.enable = true;
@@ -145,7 +136,7 @@ in
   users.users.randuck-dev = {
     isNormalUser = true;
     description = "Raphael Neumann";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" "dialout" ];
     packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
@@ -199,7 +190,9 @@ in
     dotnetCorePackages.dotnet_9.sdk
     nodejs_24
     llvmPackages_21.libcxxClang
+    helix
     python314
+    uv
     brightnessctl
     brightnessctl-rs
     playerctl
@@ -215,6 +208,12 @@ in
     element-desktop
     protonvpn-gui
     roslyn-ls
+
+
+    ansible
+    sshpass
+
+    lsb-release
 
 
     (makeDesktopItem {
