@@ -9,9 +9,20 @@ in
   ];
 
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelParams = [ "mem_sleep_default=deep" ];
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    kernelPackages = pkgs.linuxPackages_latest;
+  };
+
+  hardware.enableRedistributableFirmware = true;
+  hardware.enableAllFirmware = true;
+  hardware.firmware = with pkgs; [ 
+    linux-firmware 
+  ];
+
   services.tlp = {
     enable = true;
     settings = {
@@ -20,17 +31,21 @@ in
     };
   };
 
+  programs.steam = {
+      enable = true;
+  };
+
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
-  services.blueman.enable = true;
 
   virtualisation.docker.enable = true;
 
   # Networking
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
 
   # In order for brightness control to work, this has to be setup like this.
   # The alternative would be to use setuid on the brightnessctl-rs would be used,
@@ -40,6 +55,8 @@ in
     ACTION=="add", SUBSYSTEM=="backlight", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/backlight/%k/brightness"
     ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chgrp input /sys/class/leds/%k/brightness"
     ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/leds/%k/brightness"
+
+    ACTION=="add", SUBSYSTEM=="net", DRIVERS=="ax88179_178a", RUN+="${pkgs.coreutils}/bin/sleep 3"
   '';
 
   # Timezone and locale
@@ -54,6 +71,10 @@ in
       PasswordAuthentication = true;
     };
   };
+
+  hardware.graphics.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia.open = true;  # see the note above
 
   systemd.services.fprintd = {
     wantedBy = [ "multi-user.target" ];
@@ -157,10 +178,13 @@ in
     tmux
     # Utilities
     git
+    jujutsu
     vim
     fzf
     neovim
     btop
+    devenv
+    difftastic
 
     libinput
 
@@ -214,6 +238,13 @@ in
     sshpass
 
     lsb-release
+    usbutils
+
+    lshw
+    lmstudio
+    spotify
+
+    pavucontrol
 
 
     (makeDesktopItem {
@@ -256,4 +287,23 @@ in
 
   # This value determines the NixOS release compatibility
   system.stateVersion = "25.05";
+
+  fileSystems."/mnt/secondary" = {
+    device = "/dev/disk/by-label/secondary";
+    fsType = "ext4";
+    options = [ "defaults" "user" "exec" ];  # Allow user access and execution
+  };
+
+  fileSystems."/mnt/ternary" = {
+    device = "/dev/disk/by-label/ternary";
+    fsType = "ext4";
+    options = [ "defaults" "user" "exec" ];  # Allow user access and execution
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /mnt/secondary 0755 randuck-dev users -"
+    "d /mnt/secondary/SteamLibrary 0755 randuck-dev users -"
+    "d /mnt/ternary 0755 randuck-dev users -"
+    "d /mnt/ternary/SteamLibrary 0755 randuck-dev users -"
+  ];
 }
