@@ -20,18 +20,30 @@ in
       });
     })
   ];
-  # Bootloader
+ # Bootloader
   boot = {
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
+    kernelModules = [ "ax88179_178a" ];
+    kernelParams = [ 
+      "amd_iommu=off"
+      "pcie_aspm=off"
+      "pcie_port_pm=off"
+      "pci=realloc"
+    ];
+    extraModprobeConfig = ''
+      options mt7921e disable_aspm=1
+    '';
   };
 
-  hardware.firmware = with pkgs; [ 
-    linux-firmware 
-  ];
+  # ... rest of your existing config ...
+
+  hardware.firmware = with pkgs; [ linux-firmware ];
+  hardware.enableRedistributableFirmware = true;
+  hardware.enableAllFirmware = true;
 
   services.tlp = {
     enable = true;
