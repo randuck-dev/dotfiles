@@ -26,17 +26,16 @@ in
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [ "ax88179_178a" ];
-    kernelParams = [ 
-      "amd_iommu=off"
-      "pcie_aspm=off"
-      "pcie_port_pm=off"
-      "pci=realloc"
-    ];
-    extraModprobeConfig = ''
-      options mt7921e disable_aspm=1
-    '';
+    #kernelParams = [ 
+    #  "amd_iommu=off"
+    #  "pcie_aspm=off"
+    #  "pcie_port_pm=off"
+    #  "pci=realloc"
+    #];
+    #extraModprobeConfig = ''
+    #  options mt7921e disable_aspm=1
+    #'';
   };
 
   # ... rest of your existing config ...
