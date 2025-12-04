@@ -62,3 +62,8 @@ if which uwsm > /dev/null; then
       exec uwsm start hyprland-uwsm.desktop
   fi
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/randuck-dev/.lmstudio/bin"
+# End of LM Studio CLI section
+

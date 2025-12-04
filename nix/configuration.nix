@@ -8,10 +8,31 @@ in
     ./hardware-configuration.nix
   ];
 
+  nixpkgs.overlays = [
+    (self: super: {
+      linux-firmware = super.linux-firmware.overrideAttrs (oldAttrs: rec {
+        version = "20250808";
+        src = super.fetchgit {
+          url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
+          rev = "1ce2da4d7b91140cc3ac8698747fddb677cdf91a";
+          sha256 = "sha256-bmvhAKAY43WaPr3VLUUYoX6BU2Ret47vDnyCVP7157s=";  # Leave empty, nix will tell you the correct hash
+        };
+      });
+    })
+  ];
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelParams = [ "mem_sleep_default=deep" ];
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    kernelPackages = pkgs.linuxPackages_latest;
+  };
+
+  hardware.firmware = with pkgs; [ 
+    linux-firmware 
+  ];
+
   services.tlp = {
     enable = true;
     settings = {
@@ -19,18 +40,21 @@ in
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
     };
   };
+    programs.steam = {
+        enable = true;
+    };
 
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
-  services.blueman.enable = true;
 
   virtualisation.docker.enable = true;
 
   # Networking
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
 
   # In order for brightness control to work, this has to be setup like this.
   # The alternative would be to use setuid on the brightnessctl-rs would be used,
@@ -40,6 +64,8 @@ in
     ACTION=="add", SUBSYSTEM=="backlight", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/backlight/%k/brightness"
     ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chgrp input /sys/class/leds/%k/brightness"
     ACTION=="add", SUBSYSTEM=="leds", RUN+="${pkgs.coreutils}/bin/chmod g+w /sys/class/leds/%k/brightness"
+
+    ACTION=="add", SUBSYSTEM=="net", DRIVERS=="ax88179_178a", RUN+="${pkgs.coreutils}/bin/sleep 3"
   '';
 
   # Timezone and locale
@@ -54,6 +80,10 @@ in
       PasswordAuthentication = true;
     };
   };
+
+  hardware.graphics.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia.open = true;  # see the note above
 
   systemd.services.fprintd = {
     wantedBy = [ "multi-user.target" ];
@@ -214,6 +244,10 @@ in
     sshpass
 
     lsb-release
+    usbutils
+
+    lshw
+    lmstudio
 
 
     (makeDesktopItem {
