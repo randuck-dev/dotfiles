@@ -8,41 +8,20 @@ in
     ./hardware-configuration.nix
   ];
 
-  nixpkgs.overlays = [
-    (self: super: {
-      linux-firmware = super.linux-firmware.overrideAttrs (oldAttrs: rec {
-        version = "20250808";
-        src = super.fetchgit {
-          url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
-          rev = "1ce2da4d7b91140cc3ac8698747fddb677cdf91a";
-          sha256 = "sha256-bmvhAKAY43WaPr3VLUUYoX6BU2Ret47vDnyCVP7157s=";  # Leave empty, nix will tell you the correct hash
-        };
-      });
-    })
-  ];
- # Bootloader
+  # Bootloader
   boot = {
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelModules = [ "ax88179_178a" ];
-    #kernelParams = [ 
-    #  "amd_iommu=off"
-    #  "pcie_aspm=off"
-    #  "pcie_port_pm=off"
-    #  "pci=realloc"
-    #];
-    #extraModprobeConfig = ''
-    #  options mt7921e disable_aspm=1
-    #'';
+    kernelPackages = pkgs.linuxPackages_latest;
   };
 
-  # ... rest of your existing config ...
-
-  hardware.firmware = with pkgs; [ linux-firmware ];
   hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;
+  hardware.firmware = with pkgs; [ 
+    linux-firmware 
+  ];
 
   services.tlp = {
     enable = true;
