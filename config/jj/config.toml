@@ -1,0 +1,12 @@
+[user]
+name = "Raphael Neumann"
+email = "2768009+randuck-dev@users.noreply.github.com"
+
+[ui]
+diff-formatter = "difft"
+default-command = "log"
+
+[merge-tools.difft]
+prgoram = "difft"
+diff-args = ["--color=always", "$left", "$right"]
+
