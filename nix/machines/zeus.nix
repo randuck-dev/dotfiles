@@ -1,11 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
-let
-  brightnessctl-rs = pkgs.callPackage ./tools/brightnessctl-rs.nix { };
-in
 {
   imports = [
-    ./hardware-configuration.nix
+    ./zeus-hardware-configuration.nix
   ];
 
   # Bootloader
@@ -15,6 +12,7 @@ in
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
   hardware.enableRedistributableFirmware = true;
@@ -23,6 +21,7 @@ in
     linux-firmware 
   ];
 
+/*
   services.tlp = {
     enable = true;
     settings = {
@@ -30,20 +29,29 @@ in
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
     };
   };
-    programs.steam = {
-        enable = true;
-    };
+  */
+
+  programs.steam = {
+      enable = true;
+  };
 
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
 
-  virtualisation.docker.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    daemon.settings = {
+      insecure-registries = [ "rpi4:5000" ]; # Replace with your Pi's IP
+    };
+  };
 
   # Networking
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
+  services.blueman.enable = true;
 
 
   # In order for brightness control to work, this has to be setup like this.
@@ -68,17 +76,31 @@ in
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = true;
+      AllowUsers = [ "randuck-dev" ];
     };
   };
 
   hardware.graphics.enable = true;
+  hardware.nvidia = {
+    open = false;
+    modesetting.enable = true;
+    nvidiaSettings = true;
+  };
+
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.open = true;  # see the note above
+  services.xserver.deviceSection = ''
+  Option "Coolbits" "4"
+  '';
 
   systemd.services.fprintd = {
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "simple";
   };
+
+  systemd.targets.sleep.enable = false;
+  systemd.targets.suspend.enable = false;
+  systemd.targets.hibernate.enable = false;
+  systemd.targets.hybrid-sleep.enable = false;
 
   services.fprintd.enable = true;
 
@@ -144,6 +166,11 @@ in
     enable = true;
     mountOnMedia = true;
   };
+  
+  services.k3s = {
+    enable = true;
+    role = "server";
+  };
 
   services.pipewire = {
     enable = true;
@@ -161,95 +188,6 @@ in
     shell = pkgs.zsh;
   };
 
-  # System packages
-  environment.systemPackages = with pkgs; [
-    wget
-    curl
-    htop
-    neofetch
-    ghostty
-
-    # Wayland tools
-    waybar
-    wofi
-    dunst
-
-    tmux
-    # Utilities
-    git
-    vim
-    fzf
-    neovim
-    btop
-
-    libinput
-
-    hyprpaper
-    jq
-    htop
-    bat
-    sqlite
-    watch
-    ripgrep
-    just
-    terraform
-    k9s
-
-    uwsm
-
-    # apps
-    microsoft-edge
-    jetbrains.rider
-    obsidian
-    lazygit
-    gh
-    pyright
-    ruff
-    omnisharp-roslyn
-    unzip
-    dotnetCorePackages.dotnet_9.sdk
-    nodejs_24
-    llvmPackages_21.libcxxClang
-    helix
-    python314
-    uv
-    brightnessctl
-    brightnessctl-rs
-    playerctl
-    gtk3
-
-    # rust-env
-    rustc
-    cargo
-    rustfmt
-    rust-analyzer
-    clippy
-
-    element-desktop
-    protonvpn-gui
-    roslyn-ls
-
-
-    ansible
-    sshpass
-
-    lsb-release
-    usbutils
-
-    lshw
-    lmstudio
-
-
-    (makeDesktopItem {
-      name = "youtube-music";
-      desktopName = "YouTube Music";
-      comment = "YouTube Music Web App";
-      exec = "${pkgs.microsoft-edge}/bin/microsoft-edge --app=https://music.youtube.com";
-      icon = "youtube-music";
-      categories = [ "AudioVideo" "Audio" "Player" ];
-      startupWMClass = "music.youtube.com";
-    })
-  ];
 
   fonts = {
     packages = with pkgs; [
@@ -271,6 +209,40 @@ in
     };
   };
 
+  fileSystems."/mnt/vault" = {
+    device = "//192.168.0.44/vault/media";
+    fsType = "cifs";
+    options = [
+      "credentials=/root/.smbcredentials"
+      "uid=1000"
+      "gid=1000"
+      "iocharset=utf8"
+      "nofail"
+      "x-systemd.automount"
+    ];
+  };
+
+  fileSystems."/mnt/secondary" = {
+    device = "/dev/disk/by-label/secondary";
+    fsType = "ext4";
+    options = [ "defaults" "user" "exec" ];  # Allow user access and execution
+  };
+
+  fileSystems."/mnt/ternary" = {
+    device = "/dev/disk/by-label/ternary";
+    fsType = "ext4";
+    options = [ "defaults" "user" "exec" ];  # Allow user access and execution
+  };
+
+  # Set ownership after mount
+  systemd.tmpfiles.rules = [
+    "d /mnt/secondary 0755 randuck-dev users -"
+    "d /mnt/secondary/SteamLibrary 0755 randuck-dev users -"
+
+    "d /mnt/ternary 0755 randuck-dev users -"
+    "d /mnt/ternary/SteamLibrary 0755 randuck-dev users -"
+  ];
+
   # Enable automatic login (optional, for VM convenience)
   # services.getty.autologinUser = "yourusername";
   nixpkgs.config.allowUnfree = true;
@@ -280,4 +252,9 @@ in
 
   # This value determines the NixOS release compatibility
   system.stateVersion = "25.05";
+
+  environment.variables.LD_LIBRARY_PATH = lib.makeLibraryPath [
+    config.hardware.nvidia.package
+  ];
 }
+

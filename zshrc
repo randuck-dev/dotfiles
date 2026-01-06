@@ -1,6 +1,9 @@
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$ZSH/custom"
 
+
+typeset -U path  # Keep only unique entries in $path array
+
 ZSH_THEME="robbyrussell"
 
 plugins=(git autoswitch_virtualenv zsh-autosuggestions)
@@ -26,8 +29,8 @@ unsetopt EXTENDED_HISTORY
 unsetopt autocd
 
 export ASPNETCORE_ENVIRONMENT="Development"
-export DOTNET_ROOT="$HOME/.dotnet"
-export DOTNET_HOST_PATH="$HOME/.dotnet"
+#export DOTNET_ROOT="$HOME/.dotnet"
+#export DOTNET_HOST_PATH="$HOME/.dotnet"
 export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT=1
 
 
@@ -36,7 +39,7 @@ alias ls='ls --color=auto'
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.dotnet/tools
-export PATH=$PATH:$HOME/.dotnet
+#export PATH=$PATH:$HOME/.dotnet
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.local/bin
