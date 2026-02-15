@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   brightnessctl-rs = pkgs.callPackage ./tools/brightnessctl-rs.nix { };
@@ -211,7 +211,7 @@ in
     ruff
     omnisharp-roslyn
     unzip
-    dotnetCorePackages.dotnet_9.sdk
+    dotnetCorePackages.dotnet_10.sdk
     nodejs_24
     llvmPackages_21.libcxxClang
     helix
@@ -221,6 +221,7 @@ in
     brightnessctl-rs
     playerctl
     gtk3
+    vscodium
 
     # rust-env
     rustc
@@ -262,20 +263,12 @@ in
     packages = with pkgs; [
       nerd-fonts.caskaydia-mono
       font-awesome
+      maple-mono.truetype
+      # Maple Mono NF (Ligature unhinted)
+      maple-mono.NF-unhinted
+      # Maple Mono NF CN (Ligature unhinted)
+      maple-mono.NF-CN-unhinted
     ];
-    fontconfig = {
-      localConf = ''
-        <!-- use a less horrible font substition for pdfs such as https://www.bkent.net/Doc/mdarchiv.pdf -->
-        <match target="pattern">
-          <test name="family" qual="any">
-            <string>monospace</string>
-          </test>
-          <edit name="family" mode="assign" binding="strong">
-            <string>CaskaydiaMono Nerd Font</string>
-          </edit>
-        </match>
-      '';
-    };
   };
 
   # Enable automatic login (optional, for VM convenience)
@@ -306,4 +299,6 @@ in
     "d /mnt/ternary 0755 randuck-dev users -"
     "d /mnt/ternary/SteamLibrary 0755 randuck-dev users -"
   ];
+
+  nix.settings.trusted-users = [ "root" "randuck-dev" ];
 }

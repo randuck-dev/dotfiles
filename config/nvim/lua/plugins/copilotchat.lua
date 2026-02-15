@@ -5,7 +5,7 @@ return {
       sticky = {
         "#buffers:visible",
       },
-      model = "claude-sonnet-4",
+      model = "claude-sonnet-4.5",
     },
   },
 }
