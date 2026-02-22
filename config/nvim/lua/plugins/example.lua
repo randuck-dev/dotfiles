@@ -86,8 +86,12 @@ if true then
     {
       "LazyVim/LazyVim",
       opts = {
-        colorscheme = "catppuccin-mocha",
+        colorscheme = "rose-pine-moon",
       },
+    },
+    {
+      "rose-pine/neovim",
+      name = "rose-pine",
     },
   }
 end
