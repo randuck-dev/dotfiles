@@ -167,7 +167,7 @@ in
     wget
     curl
     htop
-    neofetch
+    fastfetch
     ghostty
 
     # Wayland tools
