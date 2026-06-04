@@ -222,6 +222,7 @@ in
     playerctl
     gtk3
     vscodium
+    opencode
 
     # rust-env
     rustc
@@ -242,6 +243,7 @@ in
     usbutils
 
     lshw
+    claude-code
     lmstudio
     spotify
 
@@ -299,6 +301,7 @@ in
     "d /mnt/ternary 0755 randuck-dev users -"
     "d /mnt/ternary/SteamLibrary 0755 randuck-dev users -"
   ];
+
 
   nix.settings.trusted-users = [ "root" "randuck-dev" ];
 }
