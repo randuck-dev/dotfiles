@@ -42,6 +42,9 @@ in
 
   virtualisation.docker.enable = true;
 
+  # Enable NVIDIA Container Toolkit so Docker can expose GPUs to containers
+  hardware.nvidia-container-toolkit.enable = true;
+
   # Networking
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
