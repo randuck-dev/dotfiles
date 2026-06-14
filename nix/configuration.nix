@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, pkgs-unstable, lib, ... }:
 
 let
   brightnessctl-rs = pkgs.callPackage ./tools/brightnessctl-rs.nix { };
@@ -246,11 +246,12 @@ in
     usbutils
 
     lshw
-    claude-code
+    pkgs-unstable.claude-code
     lmstudio
     spotify
 
     pavucontrol
+    worktrunk
 
 
     (makeDesktopItem {

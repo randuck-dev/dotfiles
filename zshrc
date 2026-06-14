@@ -51,7 +51,6 @@ export PATH=$PATH:$HOME/.dotfiles/bin
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles ; nvim ."
 
-
 # Rancher Desktop
 export PATH="$HOME/.rd/bin:$PATH"
 # Load machine-specific settings
@@ -61,4 +60,27 @@ if which uwsm > /dev/null; then
   if uwsm check may-start -q; then
       exec uwsm start hyprland-uwsm.desktop
   fi
+fi
+
+if command -v wt >/dev/null 2>&1; then
+  eval "$(command wt config shell init zsh)"
+
+  # Wrap the `wt` shell function so that `wt switch` (create or re-switch)
+  # also opens/selects a tmux window named after the branch when inside tmux.
+  functions[_wt_orig]=$functions[wt]
+  wt() {
+    _wt_orig "$@" || return
+    [[ -z $TMUX ]] && return
+    [[ $1 == switch ]] || return
+
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || return
+    local window_name=${branch//\//-}
+
+    if tmux list-windows -F '#W' | grep -qx "$window_name"; then
+      tmux select-window -t "$window_name"
+    else
+      tmux new-window -n "$window_name" -c "$PWD"
+    fi
+  }
 fi
