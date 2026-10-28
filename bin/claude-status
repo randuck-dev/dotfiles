@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+# Track what every Claude Code session on this machine is doing, so tmux
+# pickers can show which worktrees are busy or waiting on you.
+#
+#   claude-status hook     called by Claude Code hooks (JSON on stdin)
+#   claude-status list     one line per live session:
+#                          state<TAB>cwd<TAB>tmux_pane<TAB>session_id<TAB>updated
+#   claude-status count    how many sessions are waiting on you
+#   claude-status tmux     the same, as a coloured tmux status segment
+#   claude-status install  add the hooks to ~/.claude/settings.json
+#
+# States: working, input (needs a permission or an answer), done (finished
+# its turn, your move). One file per session in $CLAUDE_STATUS_DIR.
+
+set -euo pipefail
+
+dir=${CLAUDE_STATUS_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/claude-status}
+
+# Walk up from this script to the claude process that ran the hook, so we
+# can tell later whether the session is still alive.
+claude_pid() {
+  local pid=$PPID comm
+  for _ in 1 2 3 4 5; do
+    [[ -z $pid || $pid -le 1 ]] && break
+    comm=$(ps -o comm= -p "$pid" 2>/dev/null || true)
+    if [[ $comm == *claude* ]]; then
+      echo "$pid"
+      return
+    fi
+    pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+  done
+  echo "$PPID"
+}
+
+cmd_hook() {
+  local input event sid cwd state ntype file pid
+  input=$(cat)
+  event=$(jq -r '.hook_event_name // empty' <<<"$input")
+  sid=$(jq -r '.session_id // empty' <<<"$input")
+  cwd=$(jq -r '.cwd // empty' <<<"$input")
+  [[ -z $sid ]] && exit 0
+  mkdir -p "$dir"
+  file="$dir/$sid"
+
+  case $event in
+    SessionEnd)
+      rm -f "$file"
+      exit 0
+      ;;
+    SessionStart) state=done ;;
+    UserPromptSubmit | PostToolUse) state=working ;;
+    Stop) state=done ;;
+    Notification)
+      ntype=$(jq -r '.notification_type // empty' <<<"$input")
+      # idle_prompt fires a while after Stop; it isn't new information.
+      [[ $ntype == idle_prompt ]] && exit 0
+      state=input
+      ;;
+    *) exit 0 ;;
+  esac
+
+  pid=$(claude_pid)
+  jq -n --arg state "$state" --arg cwd "$cwd" --arg pane "${TMUX_PANE:-}" \
+    --arg sid "$sid" --argjson pid "$pid" --argjson updated "$(date +%s)" \
+    '{state: $state, cwd: $cwd, tmux_pane: $pane, session_id: $sid, pid: $pid, updated: $updated}' \
+    >"$file.tmp"
+  mv "$file.tmp" "$file"
+}
+
+cmd_list() {
+  [[ -d $dir ]] || exit 0
+  local f pid
+  for f in "$dir"/*; do
+    [[ -f $f && $f != *.tmp ]] || continue
+    pid=$(jq -r '.pid // 0' "$f" 2>/dev/null || echo 0)
+    # Session crashed or was killed without SessionEnd: forget it.
+    if [[ $pid -gt 0 ]] && ! kill -0 "$pid" 2>/dev/null; then
+      rm -f "$f"
+      continue
+    fi
+    jq -r '[.state, .cwd, .tmux_pane, .session_id, (.updated | tostring)] | @tsv' "$f" 2>/dev/null || true
+  done
+}
+
+cmd_count() {
+  local n
+  n=$(cmd_list | awk -F'\t' '$1 == "input" || $1 == "done"' | wc -l | tr -d ' ')
+  [[ $n -gt 0 ]] && echo "$n"
+  return 0
+}
+
+# tmux status segment: gold ● for sessions that need you, iris ◆ for
+# sessions that finished their turn. Prints nothing when all is quiet.
+cmd_tmux() {
+  cmd_list | awk -F'\t' '
+    $1 == "input" { i++ } $1 == "done" { d++ }
+    END {
+      out = ""
+      if (i) out = out "#[fg=#f6c177,bold]● " i "#[nobold]  "
+      if (d) out = out "#[fg=#c4a7e7]◆ " d "  "
+      printf "%s", out
+    }'
+}
+
+cmd_install() {
+  local settings="$HOME/.claude/settings.json" self hooks
+  # Point the hooks at this copy of the script.
+  self="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/claude-status hook"
+  mkdir -p "$(dirname "$settings")"
+  [[ -f $settings ]] || echo '{}' >"$settings"
+  cp "$settings" "$settings.bak"
+  # For each event, drop any old claude-status entry and add ours. Other
+  # hooks and settings are left alone.
+  hooks='["SessionStart","SessionEnd","UserPromptSubmit","PostToolUse","Stop","Notification"]'
+  jq --arg cmd "$self" --argjson events "$hooks" '
+    reduce $events[] as $e (.;
+      .hooks[$e] = (
+        ((.hooks[$e] // []) | map(select((.hooks // []) | all(.command | tostring | contains("claude-status") | not))))
+        + [{hooks: [{type: "command", command: $cmd}]}]
+      ))
+  ' "$settings.bak" >"$settings.tmp"
+  mv "$settings.tmp" "$settings"
+  echo "claude-status hooks installed in $settings (backup: $settings.bak)"
+}
+
+case ${1:-} in
+  hook) cmd_hook ;;
+  list) cmd_list ;;
+  count) cmd_count ;;
+  tmux) cmd_tmux ;;
+  install) cmd_install ;;
+  *)
+    echo "usage: claude-status hook|list|count|tmux|install" >&2
+    exit 2
+    ;;
+esac

@@ -42,7 +42,8 @@ CI (`.github/workflows/flake.yml`) runs on pushes and PRs to `main`: it builds t
 
 Root-level scripts are bound in `config/tmux/tmux.conf`:
 - `tmux-sessionizer.sh` (`prefix f`, `prefix d` for this repo): fzf over `~/projects` and `~/oss-projects`, opens or switches to a session.
-- `tmux-worktree-picker.sh` (`prefix W`): fzf over `git worktree list` for the current repo, opens a window named after the branch.
+- `tmux-worktree-picker.sh` (`prefix W`): repo → worktrees picker over every git repo in `~/projects` (linked worktrees are grouped under their main checkout, including Claude desktop's `.claude/worktrees/*`). Opens on the current repo's worktrees; esc goes to the repo list. Shows each worktree's Claude state and jumps to the pane running Claude there, else any pane in it, else a new window in the repo's session.
+- `bin/claude-status`: state tracker fed by global Claude Code hooks (`SessionStart`, `UserPromptSubmit`, `PostToolUse`, `Notification`, `Stop`, `SessionEnd`), so it covers terminal and Claude desktop sessions. One JSON file per session in `~/.cache/claude-status/` (state `working` / `input` / `done`, cwd, `$TMUX_PANE`, claude pid; dead pids are pruned on read). `claude-status install` merges the hooks into `~/.claude/settings.json` (pointing at the script's own path, backup in `settings.json.bak`); run it once per machine. `claude-status tmux` is the status-bar segment (● needs you, ◆ turn done).
 - `tmux-wt-spawn.sh` (`prefix C`): creates a worktree for a branch off the main checkout and opens a window running `claude` in it.
 - `tmux-claude-picker.sh` (`prefix A`): lists windows tagged `@claude=1`; windows with `monitor-silence` firing (Claude likely waiting for input) sort first.
 
