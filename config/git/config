@@ -24,3 +24,7 @@
 [user]
 	email = "2768009+randuck-dev@users.noreply.github.com"
 	name = "Raphael Neumann"
+
+# Machine-specific settings, such as extra identities set up by git-identity.sh
+[include]
+	path = ~/.gitconfig.local

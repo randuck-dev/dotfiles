@@ -16,6 +16,7 @@ log() {
 }
 
 source ./config.sh
+source ./git-identity.sh
 source ./brew-deps.sh
 
 if [ ! -f "$HOME/.ideavimrc" ]; then
