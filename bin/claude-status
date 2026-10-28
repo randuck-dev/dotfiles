@@ -5,7 +5,8 @@
 #
 #   claude-status hook     called by Claude Code hooks (JSON on stdin)
 #   claude-status list     one line per live session:
-#                          state<TAB>cwd<TAB>tmux_pane<TAB>session_id<TAB>updated
+#                          (columns are listed above cmd_list)
+#   claude-status json     the same as a JSON array
 #   claude-status count    how many sessions are waiting on you
 #   claude-status tmux     the same, as a coloured tmux status segment
 #   claude-status install  add the hooks to ~/.claude/settings.json
@@ -34,14 +35,16 @@ claude_pid() {
 }
 
 cmd_hook() {
-  local input event sid cwd state ntype file pid
+  local input event sid cwd state ntype file pid now prev transcript title detail prompt
   input=$(cat)
   event=$(jq -r '.hook_event_name // empty' <<<"$input")
   sid=$(jq -r '.session_id // empty' <<<"$input")
   cwd=$(jq -r '.cwd // empty' <<<"$input")
+  transcript=$(jq -r '.transcript_path // empty' <<<"$input")
   [[ -z $sid ]] && exit 0
   mkdir -p "$dir"
   file="$dir/$sid"
+  detail=""
 
   case $event in
     SessionEnd)
@@ -56,18 +59,47 @@ cmd_hook() {
       # idle_prompt fires a while after Stop; it isn't new information.
       [[ $ntype == idle_prompt ]] && exit 0
       state=input
+      detail=$(jq -r '.message // empty' <<<"$input")
       ;;
     *) exit 0 ;;
   esac
 
+  prev='{}'
+  [[ -f $file ]] && prev=$(cat "$file" 2>/dev/null || echo '{}')
+  prompt=$(jq -r '.prompt // empty' <<<"$input")
+
+  # Title: the session's name (Claude desktop sets one; /rename does in the
+  # terminal), else its first prompt. Looked up on turn boundaries only, so
+  # the frequent PostToolUse calls stay cheap.
+  title=$(jq -r '.title // empty' <<<"$prev")
+  if [[ $event != PostToolUse && -f $transcript ]]; then
+    title=$(grep '"type":"custom-title"' "$transcript" 2>/dev/null | tail -1 | jq -r '.customTitle // empty' 2>/dev/null || true)
+    if [[ -z $title ]]; then
+      title=$(grep -m1 '"type":"last-prompt"' "$transcript" 2>/dev/null | jq -r '.lastPrompt // empty' 2>/dev/null || true)
+    fi
+    [[ -z $title ]] && title=$prompt
+  fi
+
+  now=$(date +%s)
   pid=$(claude_pid)
-  jq -n --arg state "$state" --arg cwd "$cwd" --arg pane "${TMUX_PANE:-}" \
-    --arg sid "$sid" --argjson pid "$pid" --argjson updated "$(date +%s)" \
-    '{state: $state, cwd: $cwd, tmux_pane: $pane, session_id: $sid, pid: $pid, updated: $updated}' \
-    >"$file.tmp"
+  jq -n --argjson prev "$prev" --arg state "$state" --arg cwd "$cwd" --arg pane "${TMUX_PANE:-}" \
+    --arg sid "$sid" --argjson pid "$pid" --argjson now "$now" --arg transcript "$transcript" \
+    --arg title "$title" --arg detail "$detail" --arg prompt "$prompt" '
+    def clean: gsub("[\t\r\n]+"; " ") | .[0:200];
+    {
+      state: $state, cwd: $cwd, tmux_pane: $pane, session_id: $sid, pid: $pid,
+      updated: $now,
+      since: (if $prev.state == $state and $prev.since then $prev.since else $now end),
+      transcript: (if $transcript != "" then $transcript else ($prev.transcript // "") end),
+      title: ($title | clean),
+      detail: ($detail | clean),
+      last_prompt: (if $prompt != "" then ($prompt | clean) else ($prev.last_prompt // "") end)
+    }' >"$file.tmp"
   mv "$file.tmp" "$file"
 }
 
+# One line per live session. Empty values are "-" so `read` keeps columns.
+#   state cwd tmux_pane session_id updated since title detail transcript
 cmd_list() {
   [[ -d $dir ]] || exit 0
   local f pid
@@ -79,8 +111,21 @@ cmd_list() {
       rm -f "$f"
       continue
     fi
-    jq -r '[.state, .cwd, .tmux_pane, .session_id, (.updated | tostring)] | @tsv' "$f" 2>/dev/null || true
+    jq -r 'def v: if . == null or . == "" then "-" else tostring end;
+      [(.state|v), (.cwd|v), (.tmux_pane|v), (.session_id|v), (.updated|v),
+       ((.since // .updated)|v), (.title|v), (.detail|v), (.transcript|v)] | @tsv' "$f" 2>/dev/null || true
   done
+}
+
+# All live sessions as one JSON array (the raw status files).
+cmd_json() {
+  cmd_list >/dev/null # prunes dead sessions
+  local files=("$dir"/*)
+  if [[ -f ${files[0]:-} ]]; then
+    jq -s '.' "${files[@]}" 2>/dev/null || echo '[]'
+  else
+    echo '[]'
+  fi
 }
 
 cmd_count() {
@@ -127,11 +172,12 @@ cmd_install() {
 case ${1:-} in
   hook) cmd_hook ;;
   list) cmd_list ;;
+  json) cmd_json ;;
   count) cmd_count ;;
   tmux) cmd_tmux ;;
   install) cmd_install ;;
   *)
-    echo "usage: claude-status hook|list|count|tmux|install" >&2
+    echo "usage: claude-status hook|list|json|count|tmux|install" >&2
     exit 2
     ;;
 esac
