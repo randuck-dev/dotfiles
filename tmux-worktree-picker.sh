@@ -9,9 +9,11 @@
 #   tmux-worktree-picker.sh --all   every Claude session, most urgent
 #                                   first (prefix A)
 #
-# Enter jumps to the worktree: the tmux pane running Claude there, else
-# any pane already in it, else a new window in the repo's session (same
-# session naming as the sessionizer).
+# Enter on a row with a Claude session goes to the tmux pane running it,
+# or resumes it (claude --resume) in a new window. Rows without a session
+# go to any pane already in the worktree, else a new window in the repo's
+# session (same session naming as the sessionizer). ctrl-o always opens
+# the worktree itself.
 #
 # The --rows and --preview modes are what fzf calls back into.
 
@@ -247,8 +249,51 @@ review() {
   "$(dirname "$self")/bin/git-review" "$path"
 }
 
+# Enter on a row with a Claude session: go to the pane running it, or
+# resume it in a new window if no tmux pane has it. A session still open
+# elsewhere (usually Claude desktop) is resumed with --fork-session, so the
+# two don't write to the same conversation.
+open_session() {
+  local sid=$1 fallback=$2 info spane scwd live top primary session name win fork=""
+  info=$( { "$status_cmd" json; "$status_cmd" touched; } 2>/dev/null | jq -rs --arg sid "$sid" '
+    (.[0] | map(select(.session_id == $sid)) | .[0]) as $live
+    | (add | map(select(.session_id == $sid)) | .[0]) as $any
+    | [($live.tmux_pane // "" | if . == "" then "-" else . end),
+       ($any.cwd // ""), (if $live then "live" else "ended" end)] | @tsv' 2>/dev/null || true)
+  IFS=$'\t' read -r spane scwd live <<<"$info"
+  [[ -n $scwd && -d $scwd ]] || scwd=$fallback
+
+  if [[ $spane != - && -n $spane ]] && tmux list-panes -a -F '#{pane_id}' | grep -qx "$spane"; then
+    session=$(tmux display-message -p -t "$spane" '#{session_name}')
+    tmux switch-client -t "$session"
+    tmux select-window -t "$spane"
+    tmux select-pane -t "$spane"
+    return
+  fi
+
+  [[ $live == live ]] && fork=" --fork-session"
+  top=$(git -C "$scwd" rev-parse --show-toplevel 2>/dev/null || echo "$scwd")
+  primary=$(git -C "$scwd" worktree list --porcelain 2>/dev/null | awk '/^worktree /{print substr($0, 10); exit}')
+  [[ -n $primary ]] || primary=$top
+  session=$(basename "$primary" | tr ':.' '__')
+  name=$(git -C "$scwd" rev-parse --abbrev-ref HEAD 2>/dev/null || basename "$scwd")
+  name=${name//\//-}
+  tmux has-session -t="$session" 2>/dev/null || tmux new-session -ds "$session" -c "$primary"
+  win=$(tmux new-window -P -F '#{window_id}' -t "$session:" -n "$name" -c "$scwd" \
+    "claude --resume $sid$fork; exec ${SHELL:-zsh}")
+  # Same tags as tmux-wt-spawn.sh: a claude window, flagged after 30s of silence.
+  tmux set-option -w -t "$win" @claude 1
+  tmux set-option -w -t "$win" monitor-silence 30
+  tmux switch-client -t "$session"
+  tmux select-window -t "$win"
+}
+
 jump() {
-  local path=$1 pane=$2 branch=$3 primary=$4 session window_name
+  local path=$1 pane=$2 branch=$3 primary=$4 sid=${5:--} session window_name
+  if [[ $sid != - ]]; then
+    open_session "$sid" "$path"
+    return
+  fi
   if [[ $pane != - ]] && tmux list-panes -a -F '#{pane_id}' | grep -qx "$pane"; then
     session=$(tmux display-message -p -t "$pane" '#{session_name}')
     tmux switch-client -t "$session"
@@ -342,8 +387,8 @@ main() {
       repo=""
       continue
     fi
-    IFS=$'\t' read -r _ path pane branch primary <<<"$selected"
-    jump "$path" "$pane" "$branch" "$primary"
+    IFS=$'\t' read -r _ path pane branch primary sid _ <<<"$selected"
+    jump "$path" "$pane" "$branch" "$primary" "$sid"
     exit 0
   done
 }
@@ -384,8 +429,8 @@ case ${1:-} in
   --all)
     selected=$(pick_all || true)
     [[ -f $PICKER_VIEW_FILE.done || -z $selected ]] && exit 0
-    IFS=$'\t' read -r _ path pane branch primary <<<"$selected"
-    jump "$path" "$pane" "$branch" "$primary"
+    IFS=$'\t' read -r _ path pane branch primary sid _ <<<"$selected"
+    jump "$path" "$pane" "$branch" "$primary" "$sid"
     ;;
   *) main "$@" ;;
 esac
