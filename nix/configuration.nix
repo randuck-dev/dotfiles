@@ -165,11 +165,9 @@ in
     shell = pkgs.zsh;
   };
 
-  # System packages
+  # NixOS-only packages; shared ones are in common.nix
   environment.systemPackages = with pkgs; [
-    wget
     curl
-    htop
     fastfetch
     ghostty
 
@@ -178,29 +176,13 @@ in
     wofi
     dunst
 
-    tmux
     # Utilities
-    git
-    jujutsu
     vim
-    fzf
-    neovim
-    btop
-    devenv
     difftastic
 
     libinput
 
     hyprpaper
-    jq
-    htop
-    bat
-    sqlite
-    watch
-    ripgrep
-    just
-    terraform
-    k9s
 
     uwsm
 
@@ -208,18 +190,10 @@ in
     microsoft-edge
     jetbrains.rider
     obsidian
-    lazygit
-    gh
     pyright
-    ruff
     omnisharp-roslyn
-    unzip
     dotnetCorePackages.dotnet_10.sdk
-    nodejs_24
     llvmPackages_21.libcxxClang
-    helix
-    python314
-    uv
     brightnessctl
     brightnessctl-rs
     playerctl
@@ -251,7 +225,6 @@ in
     spotify
 
     pavucontrol
-    worktrunk
 
 
     (makeDesktopItem {
@@ -264,18 +237,6 @@ in
       startupWMClass = "music.youtube.com";
     })
   ];
-
-  fonts = {
-    packages = with pkgs; [
-      nerd-fonts.caskaydia-mono
-      font-awesome
-      maple-mono.truetype
-      # Maple Mono NF (Ligature unhinted)
-      maple-mono.NF-unhinted
-      # Maple Mono NF CN (Ligature unhinted)
-      maple-mono.NF-CN-unhinted
-    ];
-  };
 
   # Enable automatic login (optional, for VM convenience)
   # services.getty.autologinUser = "yourusername";

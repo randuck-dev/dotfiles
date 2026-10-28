@@ -1,0 +1,29 @@
+name: Flake
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  macos:
+    name: Build macOS config
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - name: Build
+        run: nix build .#darwinConfigurations.mac.system --print-build-logs
+
+  nixos:
+    # Evaluates the whole system without building it: a full build would compile
+    # unfree packages (e.g. NVIDIA drivers) that aren't in the binary cache.
+    name: Evaluate NixOS config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - name: Evaluate
+        run: nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath

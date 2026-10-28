@@ -11,21 +11,25 @@ Baseline dotfiles and machine setup shared by all of the user's machines: macOS 
 - Nothing that identifies the user's employer or work setup goes in the repo. Machine-specific values are asked for during setup and stored outside the repo (see `git-identity.sh`).
 - No secrets, tokens or credentials. Credentials live outside the repo (e.g. the CIFS mount reads `/root/.smbcredentials`).
 
-## Two setup paths
+## Setup
 
-**macOS bootstrap (`./dev.sh`)** — run from the repo root (it sources `./config.sh` etc. relatively). The `bs` alias in `zshrc` runs it.
+`./dev.sh` sets up any machine and is safe to re-run (the `bs` alias in `zshrc` runs it):
 1. `config.sh` symlinks each `config/<name>` directory to `~/.config/<name>`, skipping targets that already exist.
 2. `git-identity.sh` asks once (only when interactive) which GitHub owners need a different git email. It writes `~/.gitconfig.local` (with `includeIf "hasconfig:remote.*.url:..."` rules) and `~/.gitconfig.<owner>`. `config/git/config` includes `~/.gitconfig.local` last. Delete `~/.gitconfig.local` to be asked again.
-3. `brew-deps.sh` (macOS only) runs every script in `pkgs/`; each is a plain `brew install ...`. `grep=<pattern> ./dev.sh` runs only the `pkgs/` scripts whose name matches.
-4. Symlinks `zshrc` → `~/.zshrc` and `.ideavimrc` → `~/.ideavimrc` if they don't exist.
+3. `oh-my-zsh.sh` installs oh-my-zsh and the plugins `zshrc` uses.
+4. Symlinks `zshrc` and `.ideavimrc` into `~` if they don't exist.
+5. On macOS, applies the flake's `mac` config with `sudo darwin-rebuild switch --flake ~/.dotfiles#mac` (the first run uses the flake's own `darwin-rebuild` package). Needs Homebrew and Nix installed first. On NixOS it only prints a reminder to run `athena-update`.
 
-CI (`.github/workflows/ci-dev.yml`) runs `./dev.sh` on `macos-14` for pushes and PRs to `main`, non-interactively. Anything in `dev.sh` that prompts must skip when stdin isn't a terminal.
+## Nix flake
 
-**NixOS flake (`flake.nix`)** — one host, `nixosConfigurations.nixos` (x86_64-linux), built from `nix/configuration.nix` (+ `nix/hardware-configuration.nix`). nixpkgs is `nixos-26.05`; `pkgs-unstable` (nixos-unstable, unfree allowed) is passed as a module argument for packages that need newer versions. Custom packages live in `nix/tools/` and are pulled in with `pkgs.callPackage`.
-- Apply: `sudo nixos-rebuild switch --flake ~/.dotfiles/#nixos` (wrapped by `bin/athena-update`, which sends a desktop notification). Check without switching: `nixos-rebuild build --flake .#nixos`.
-- New files must be tracked by git before a flake build sees them.
+- `nix/common.nix`: packages and fonts for **every** machine. A tool wanted everywhere goes here.
+- `nix/darwin.nix`: macOS-only (nix-darwin). One config, `darwinConfigurations.mac`, for all Macs; nothing machine-specific. Desktop apps are Homebrew casks (`homebrew.casks`); activation never removes other Homebrew packages (`cleanup = "none"`). `nix.enable = false` because Nix itself is Lix, managed by its installer, which also doesn't turn on flakes by default, so pass `--extra-experimental-features "nix-command flakes"` to `nix` commands.
+- `nix/configuration.nix` (+ `hardware-configuration.nix`): the NixOS desktop, `nixosConfigurations.nixos`. Apply with `sudo nixos-rebuild switch --flake ~/.dotfiles/#nixos` (wrapped by `bin/athena-update`).
+- Inputs: `nixos-26.05` for NixOS, `nixpkgs-26.05-darwin` for macOS, `nix-darwin-26.05`, and `nixos-unstable` passed to modules as `pkgs-unstable`. Custom packages live in `nix/tools/` (`pkgs.callPackage`).
+- Check locally: `nix build .#darwinConfigurations.mac.system` on a Mac. Evaluating the NixOS config needs an x86_64-linux builder (part of it is built during evaluation), so on a Mac rely on CI for that.
+- New files must be `git add`ed before the flake sees them.
 
-macOS packages come from `pkgs/*.sh`, Linux packages from `nix/configuration.nix`. A tool wanted on both needs both.
+CI (`.github/workflows/flake.yml`) runs on pushes and PRs to `main`: it builds the macOS config on `macos-15` and evaluates the NixOS config on Ubuntu (not a full build: unfree packages like NVIDIA drivers aren't in the binary cache). Anything in `dev.sh` that prompts must skip when stdin isn't a terminal.
 
 ## Layout notes
 
@@ -33,7 +37,6 @@ macOS packages come from `pkgs/*.sh`, Linux packages from `nix/configuration.nix
 - Hyprland desktop (NixOS): `config/hypr` (main config is `hyprland.lua`), `waybar`, `wofi`, `uwsm`, `brightnessctl-rs`. `zshrc` starts Hyprland through `uwsm` when available. `bin/athena-*` are the helper scripts those configs call; `zshrc` adds `bin/` to `PATH`.
 - macOS: `config/aerospace` (tiling WM).
 - `config/nvim`: LazyVim. Plugin specs in `lua/plugins/`; custom Lua tools in `plugin/` (`nugetify.lua`, `gh_fetcher.lua`, `fleetingnotes.lua`).
-- `config/jj`: Jujutsu config. It sets `user.email` itself, because jj does not read git's config, so `git-identity.sh` does not affect jj commits.
 
 ## tmux + worktree workflow
 
@@ -47,4 +50,4 @@ Root-level scripts are bound in `config/tmux/tmux.conf`:
 
 ## Version control
 
-The repo is colocated git + Jujutsu (`.jj/`, `trunk()` = `main@origin`), and jj keeps git on a detached HEAD. Check `jj log` as well as `git status` before committing or pushing: a local checkout can be on an older line than `main`. Remote: `https://github.com/randuck-dev/dotfiles`.
+Plain git. Parallel work happens in git worktrees (see the tmux scripts above). Remote: `https://github.com/randuck-dev/dotfiles`.
