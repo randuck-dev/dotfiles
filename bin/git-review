@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# Review everything a branch changes compared to its target: its commits
+# plus uncommitted work, measured from where it split off the target (the
+# merge base), so newer commits on the target don't show up as noise.
+#
+#   git review [dir] [target]        open Neovim in diffview on the changes
+#   git-review --preview dir [width] print the changes (for fzf previews)
+#   git-review --base dir            print "<base sha> <target>"
+#
+# The target is origin's default branch (origin/HEAD), else origin/main,
+# origin/master, main or master. It uses what was last fetched; it does
+# not fetch.
+
+set -euo pipefail
+
+target_ref() {
+  local dir=$1 r b
+  if r=$(git -C "$dir" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null); then
+    echo "$r"
+    return
+  fi
+  for b in origin/main origin/master main master; do
+    if git -C "$dir" rev-parse -q --verify "$b^{commit}" >/dev/null 2>&1; then
+      echo "$b"
+      return
+    fi
+  done
+}
+
+# Prints "<sha> <target>", or fails if there is nothing to compare with.
+merge_base() {
+  local dir=$1 target=${2:-} base
+  [[ -n $target ]] || target=$(target_ref "$dir")
+  [[ -n $target ]] || return 1
+  base=$(git -C "$dir" merge-base "$target" HEAD 2>/dev/null) || return 1
+  echo "$base $target"
+}
+
+preview() {
+  local dir=$1 width=${2:-${FZF_PREVIEW_COLUMNS:-100}} base target untracked
+  local muted=$'\033[38;2;110;106;134m' off=$'\033[0m'
+  if ! read -r base target < <(merge_base "$dir"); then
+    echo "no target branch to compare with"
+    return
+  fi
+  printf '%schanges since %s (%s)%s\n\n' "$muted" "$target" "$(git -C "$dir" rev-parse --short "$base")" "$off"
+  git -C "$dir" diff --stat=$((width - 2)) --color=always "$base" 2>/dev/null
+  untracked=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null)
+  if [[ -n $untracked ]]; then
+    printf '\n%snew, not added yet:%s\n' "$muted" "$off"
+    printf '%s\n' "$untracked" | sed 's/^/ /'
+  fi
+  echo
+  if command -v delta >/dev/null; then
+    git -C "$dir" diff "$base" 2>/dev/null | delta --paging=never --width="$width" --file-style=bold --hunk-header-style=omit 2>/dev/null
+  else
+    git -C "$dir" diff --color=always "$base" 2>/dev/null
+  fi
+}
+
+open_review() {
+  local dir=${1:-$PWD} target=${2:-} base
+  dir=$(git -C "$dir" rev-parse --show-toplevel)
+  if ! read -r base target < <(merge_base "$dir" "$target"); then
+    echo "git review: no target branch to compare with" >&2
+    exit 1
+  fi
+  cd "$dir"
+  # g:review_mode makes q quit Neovim (see config/nvim/lua/plugins/diffview.lua).
+  exec nvim -c "let g:review_mode = 1" -c "DiffviewOpen $base"
+}
+
+case ${1:-} in
+  --preview) preview "$2" "${3:-}" ;;
+  --base) merge_base "$2" ;;
+  -h | --help) sed -n '3,14p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) open_review "$@" ;;
+esac

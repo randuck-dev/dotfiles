@@ -143,12 +143,18 @@ rows() {
 # asked, else the live pane, else git status.
 preview() {
   local path=$1 pane=$2 branch=$3 sid=$4 t
-  # View: claude (last prompt and reply) or git. ctrl-t flips it via the
-  # file in $PICKER_VIEW_FILE so the choice sticks while you move around.
+  # View: claude (last prompt and reply), changes (diff against the target
+  # branch, see bin/git-review) or git (status and log). ctrl-t cycles them
+  # via the file in $PICKER_VIEW_FILE so the choice sticks as you move.
   local view=${5:-$(cat "${PICKER_VIEW_FILE:-/dev/null}" 2>/dev/null || true)}
   view=${view:-claude}
   local iris=$'\033[38;2;196;167;231m' muted=$'\033[38;2;110;106;134m' foam=$'\033[38;2;156;207;216m' off=$'\033[0m'
   printf '%s%s  %s%s\n\n' "$muted" "$branch" "${path/#$HOME/~}" "$off"
+
+  if [[ $view == changes ]]; then
+    "$(dirname "$self")/bin/git-review" --preview "$path" "${FZF_PREVIEW_COLUMNS:-100}"
+    return
+  fi
 
   t=""
   if [[ $view == claude && $sid != - ]]; then
@@ -229,7 +235,8 @@ pick_repo() {
 
 # Keys shared by the worktree and all-sessions pickers.
 #   ctrl-g  lazygit in the highlighted worktree (back to the picker on quit)
-#   ctrl-t  flip the preview between Claude and git
+#   ctrl-d  review the branch in Neovim (diffview, via bin/git-review)
+#   ctrl-t  cycle the preview: Claude, changes, git
 #   ctrl-r  refresh
 wt_binds() {
   local reload=$1
@@ -237,6 +244,7 @@ wt_binds() {
   printf '%s\0' \
     --bind "ctrl-r:reload($reload)" \
     --bind "ctrl-g:execute($(q "$self") --lazygit {2})+reload($reload)" \
+    --bind "ctrl-d:execute($(q "$(dirname "$self")/bin/git-review") {2})+reload($reload)" \
     --bind "ctrl-t:execute-silent($(q "$self") --toggle-view)+refresh-preview+transform-preview-label($(q "$self") --view-label)" \
     --preview "$preview_cmd" \
     --preview-label " claude " \
@@ -252,7 +260,7 @@ pick_worktree() {
 pick_all() {
   local args=()
   while IFS= read -r -d '' a; do args+=("$a"); done < <(wt_binds "$(q "$self") --rows all")
-  rows all | fzf_ui "claude sessions" "enter jump · ctrl-g lazygit · ctrl-t git/claude · ctrl-r refresh · esc close" "${args[@]}"
+  rows all | fzf_ui "claude sessions" "enter jump · ctrl-d review · ctrl-g lazygit · ctrl-t preview · ctrl-r refresh · esc close" "${args[@]}"
 }
 
 main() {
@@ -266,7 +274,7 @@ main() {
       repo=$(pick_repo "$current" || true)
       [[ -z $repo ]] && exit 0
     fi
-    selected=$(pick_worktree "$repo" "$(basename "$repo")" "enter jump · ctrl-g lazygit · ctrl-t git/claude · ctrl-r refresh · esc repos" || true)
+    selected=$(pick_worktree "$repo" "$(basename "$repo")" "enter jump · ctrl-d review · ctrl-g lazygit · ctrl-t preview · ctrl-r refresh · esc repos" || true)
     if [[ -z $selected ]]; then
       repo=""
       continue
@@ -285,7 +293,11 @@ fi
 
 case ${1:-} in
   --toggle-view)
-    [[ $(cat "$PICKER_VIEW_FILE" 2>/dev/null) == git ]] && echo claude >"$PICKER_VIEW_FILE" || echo git >"$PICKER_VIEW_FILE"
+    case $(cat "$PICKER_VIEW_FILE" 2>/dev/null) in
+      changes) echo git ;;
+      git) echo claude ;;
+      *) echo changes ;;
+    esac >"$PICKER_VIEW_FILE"
     ;;
   --view-label)
     v=$(cat "$PICKER_VIEW_FILE" 2>/dev/null || true)
