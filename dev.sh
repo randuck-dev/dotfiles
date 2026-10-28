@@ -31,10 +31,10 @@ if [ "$(uname)" = "Darwin" ]; then
 
   echo "Applying the macOS config (asks for your password)"
   if command -v darwin-rebuild >/dev/null; then
-    sudo darwin-rebuild switch --flake "$DOTFILES_DIR#mac"
+    sudo -H darwin-rebuild switch --flake "$DOTFILES_DIR#mac"
   else
     # First run: darwin-rebuild isn't installed yet, so run it from the flake.
-    sudo nix --extra-experimental-features "nix-command flakes" \
+    sudo -H nix --extra-experimental-features "nix-command flakes" \
       run "$DOTFILES_DIR#darwin-rebuild" -- switch --flake "$DOTFILES_DIR#mac"
   fi
 else
