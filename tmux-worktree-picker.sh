@@ -142,7 +142,11 @@ rows() {
 # Preview for one worktree: what Claude last said and what you last
 # asked, else the live pane, else git status.
 preview() {
-  local path=$1 pane=$2 branch=$3 sid=$4 view=${5:-claude} t
+  local path=$1 pane=$2 branch=$3 sid=$4 t
+  # View: claude (last prompt and reply) or git. ctrl-t flips it via the
+  # file in $PICKER_VIEW_FILE so the choice sticks while you move around.
+  local view=${5:-$(cat "${PICKER_VIEW_FILE:-/dev/null}" 2>/dev/null || true)}
+  view=${view:-claude}
   local iris=$'\033[38;2;196;167;231m' muted=$'\033[38;2;110;106;134m' foam=$'\033[38;2;156;207;216m' off=$'\033[0m'
   printf '%s%s  %s%s\n\n' "$muted" "$branch" "${path/#$HOME/~}" "$off"
 
@@ -173,6 +177,8 @@ preview() {
   fi
 
   git -C "$path" -c color.status=always status --short --branch 2>/dev/null
+  echo
+  git -C "$path" diff --stat --color=always HEAD 2>/dev/null | tail -15
   echo
   git -C "$path" log --oneline --decorate --color=always -12 2>/dev/null
 }
@@ -221,25 +227,32 @@ pick_repo() {
     cut -f2
 }
 
-pick_worktree() {
-  local primary=$1 label=$2 footer=$3
+# Keys shared by the worktree and all-sessions pickers.
+#   ctrl-g  lazygit in the highlighted worktree (back to the picker on quit)
+#   ctrl-t  flip the preview between Claude and git
+#   ctrl-r  refresh
+wt_binds() {
+  local reload=$1
   local preview_cmd="$(q "$self") --preview {2} {3} {4} {6}"
-  rows wt "$primary" | fzf_ui "$label" "$footer" \
-    --bind "ctrl-r:reload($(q "$self") --rows wt $(q "$primary"))" \
-    --bind "ctrl-g:change-preview($preview_cmd git)" \
-    --bind "ctrl-o:change-preview($preview_cmd)" \
+  printf '%s\0' \
+    --bind "ctrl-r:reload($reload)" \
+    --bind "ctrl-g:execute($(q "$self") --lazygit {2})+reload($reload)" \
+    --bind "ctrl-t:execute-silent($(q "$self") --toggle-view)+refresh-preview+transform-preview-label($(q "$self") --view-label)" \
     --preview "$preview_cmd" \
-    --preview-window="down,45%,border-top,wrap"
+    --preview-label " claude " \
+    --preview-window "down,45%,border-top,wrap"
+}
+
+pick_worktree() {
+  local primary=$1 label=$2 footer=$3 args=()
+  while IFS= read -r -d '' a; do args+=("$a"); done < <(wt_binds "$(q "$self") --rows wt $(q "$primary")")
+  rows wt "$primary" | fzf_ui "$label" "$footer" "${args[@]}"
 }
 
 pick_all() {
-  local preview_cmd="$(q "$self") --preview {2} {3} {4} {6}"
-  rows all | fzf_ui "claude sessions" "enter jump · ctrl-r refresh · ctrl-g git · esc close" \
-    --bind "ctrl-r:reload($(q "$self") --rows all)" \
-    --bind "ctrl-g:change-preview($preview_cmd git)" \
-    --bind "ctrl-o:change-preview($preview_cmd)" \
-    --preview "$preview_cmd" \
-    --preview-window="down,45%,border-top,wrap"
+  local args=()
+  while IFS= read -r -d '' a; do args+=("$a"); done < <(wt_binds "$(q "$self") --rows all")
+  rows all | fzf_ui "claude sessions" "enter jump · ctrl-g lazygit · ctrl-t git/claude · ctrl-r refresh · esc close" "${args[@]}"
 }
 
 main() {
@@ -253,7 +266,7 @@ main() {
       repo=$(pick_repo "$current" || true)
       [[ -z $repo ]] && exit 0
     fi
-    selected=$(pick_worktree "$repo" "$(basename "$repo")" "enter jump · ctrl-r refresh · ctrl-g git · esc repos" || true)
+    selected=$(pick_worktree "$repo" "$(basename "$repo")" "enter jump · ctrl-g lazygit · ctrl-t git/claude · ctrl-r refresh · esc repos" || true)
     if [[ -z $selected ]]; then
       repo=""
       continue
@@ -264,9 +277,30 @@ main() {
   done
 }
 
+if [[ ${1:-} == "" || ${1:-} == --all || ${1:-} != --* ]]; then
+  PICKER_VIEW_FILE=$(mktemp "${TMPDIR:-/tmp}/worktree-picker.XXXXXX")
+  export PICKER_VIEW_FILE
+  trap 'rm -f "$PICKER_VIEW_FILE"' EXIT
+fi
+
 case ${1:-} in
+  --toggle-view)
+    [[ $(cat "$PICKER_VIEW_FILE" 2>/dev/null) == git ]] && echo claude >"$PICKER_VIEW_FILE" || echo git >"$PICKER_VIEW_FILE"
+    ;;
+  --view-label)
+    v=$(cat "$PICKER_VIEW_FILE" 2>/dev/null || true)
+    echo " ${v:-claude} "
+    ;;
+  --lazygit)
+    if command -v lazygit >/dev/null; then
+      cd "$2" && lazygit
+    else
+      echo "lazygit isn't installed (it's in nix/common.nix; rebuild to get it)."
+      read -r -n 1 -p "press any key" || true
+    fi
+    ;;
   --rows) rows "$2" "${3:-}" ;;
-  --preview) preview "$2" "$3" "$4" "$5" "${6:-claude}" ;;
+  --preview) preview "$2" "$3" "$4" "$5" "${6:-}" ;;
   --all)
     selected=$(pick_all || true)
     [[ -z $selected ]] && exit 0
