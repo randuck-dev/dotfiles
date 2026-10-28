@@ -72,6 +72,9 @@ in
 
   environment.variables.DOTNET_ROOT = "${dotnet}/share/dotnet";
 
+  # Homebrew on PATH for every shell, after the Nix profiles so Nix packages win.
+  environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
+
   # Desktop apps come from Homebrew casks; many are missing or work poorly in nixpkgs on macOS.
   # Activation only installs what's listed and never removes other Homebrew packages.
   homebrew = {
