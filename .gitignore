@@ -15,4 +15,3 @@ config/*
 !config/ghostty
 !config/git/
 !config/hypr/
-!config/jj/
