@@ -7,6 +7,7 @@
 #   claude-status list     one line per live session:
 #                          (columns are listed above cmd_list)
 #   claude-status json     the same as a JSON array
+#   claude-status touched  other worktrees each session worked in (14 days)
 #   claude-status count    how many sessions are waiting on you
 #   claude-status tmux     the same, as a coloured tmux status segment
 #   claude-status install  add the hooks to ~/.claude/settings.json
@@ -96,6 +97,53 @@ cmd_hook() {
       last_prompt: (if $prompt != "" then ($prompt | clean) else ($prev.last_prompt // "") end)
     }' >"$file.tmp"
   mv "$file.tmp" "$file"
+
+  record_touched "$input" "$sid" "$cwd" "$file"
+}
+
+# Worktrees a session works in besides its own folder: a devtool session
+# edits ../other-repo-branch, for example. File tools give exact paths;
+# for Bash we pick out `git -C <dir>`, `cd <dir>`, `git worktree add <dir>`
+# and `clone <repo> <dir>`. Kept in touched/<session> for $TOUCHED_DAYS
+# after the session ends, so you can still review what it changed.
+record_touched() {
+  local input=$1 sid=$2 cwd=$3 status_file=$4 tfile="$dir/touched/$2" own c d top tops=""
+  own=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || echo "$cwd")
+  while IFS= read -r c; do
+    [[ -z $c ]] && continue
+    c=${c/#\~/$HOME}
+    [[ $c == /* ]] || c="$cwd/$c"
+    d=$c
+    # A file, or a folder that isn't there yet: use the nearest existing folder.
+    while [[ ! -d $d && $d != / ]]; do d=$(dirname "$d"); done
+    top=$(git -C "$d" rev-parse --show-toplevel 2>/dev/null) || continue
+    [[ $top == "$own" ]] && continue
+    tops+="$top"$'\n'
+  done < <(jq -r '
+    def unq: sub("^[\"\u0027]"; "") | sub("[\"\u0027]$"; "");
+    def arg: "(\"[^\"]+\"|\u0027[^\u0027]+\u0027|[^\\s;&|()-][^\\s;&|()]*)";
+    if .hook_event_name != "PostToolUse" then empty
+    elif (.tool_name // "" | test("^(Edit|Write|MultiEdit|NotebookEdit)$")) then
+      (.tool_input.file_path // .tool_input.notebook_path // empty)
+    elif .tool_name == "Bash" then
+      (.tool_input.command // "") as $c
+      | ($c | scan("(?:git\\s+-C|\\bcd)\\s+" + arg), scan("worktree\\s+add\\s+(?:-[bB]\\s+\\S+\\s+|--?[a-zA-Z-]+\\s+)*" + arg), scan("\\bclone\\s+\\S+\\s+" + arg))
+      | .[0] | unq
+    else empty end' <<<"$input" 2>/dev/null || true)
+
+  # Nothing new and nothing recorded yet: done.
+  [[ -z $tops && ! -f $tfile ]] && return 0
+  mkdir -p "$dir/touched"
+  local prevt='{}'
+  [[ -f $tfile ]] && prevt=$(cat "$tfile" 2>/dev/null || echo '{}')
+  jq -n --argjson prev "$prevt" --slurpfile st "$status_file" --arg tops "$tops" --argjson now "$(date +%s)" '
+    ($st[0] // {}) as $s
+    | ($tops | split("\n") | map(select(length > 0))) as $new
+    | {
+        session_id: $s.session_id, cwd: $s.cwd, title: ($s.title // $prev.title // ""),
+        transcript: ($s.transcript // $prev.transcript // ""), updated: $now,
+        paths: (reduce $new[] as $p (($prev.paths // {}); .[$p] = $now))
+      }' >"$tfile.tmp" && mv "$tfile.tmp" "$tfile"
 }
 
 # One line per live session. Empty values are "-" so `read` keeps columns.
@@ -120,12 +168,39 @@ cmd_list() {
 # All live sessions as one JSON array (the raw status files).
 cmd_json() {
   cmd_list >/dev/null # prunes dead sessions
-  local files=("$dir"/*)
-  if [[ -f ${files[0]:-} ]]; then
+  local f files=()
+  for f in "$dir"/*; do
+    [[ -f $f && $f != *.tmp ]] && files+=("$f")
+  done
+  if [[ ${#files[@]} -gt 0 ]]; then
     jq -s '.' "${files[@]}" 2>/dev/null || echo '[]'
   else
     echo '[]'
   fi
+}
+
+# Touched worktrees per session, live or ended within $TOUCHED_DAYS, as a
+# JSON array of {session_id, cwd, title, transcript, updated, paths, live}.
+cmd_touched() {
+  local days=${TOUCHED_DAYS:-14} f files=() cutoff
+  [[ -d $dir/touched ]] || { echo '[]'; return; }
+  cmd_list >/dev/null # prunes dead sessions, so "live" is accurate
+  cutoff=$(($(date +%s) - days * 86400))
+  for f in "$dir"/touched/*; do
+    [[ -f $f && $f != *.tmp ]] || continue
+    if [[ $(jq -r '.updated // 0' "$f" 2>/dev/null || echo 0) -lt $cutoff ]]; then
+      rm -f "$f"
+      continue
+    fi
+    files+=("$f")
+  done
+  if [[ ${#files[@]} -eq 0 ]]; then
+    echo '[]'
+    return
+  fi
+  local live
+  live=$(cmd_json | jq -c 'map(.session_id)')
+  jq -s --argjson live "$live" 'map(. + {live: (.session_id as $s | $live | index($s) != null)})' "${files[@]}" 2>/dev/null || echo '[]'
 }
 
 cmd_count() {
@@ -173,11 +248,12 @@ case ${1:-} in
   hook) cmd_hook ;;
   list) cmd_list ;;
   json) cmd_json ;;
+  touched) cmd_touched ;;
   count) cmd_count ;;
   tmux) cmd_tmux ;;
   install) cmd_install ;;
   *)
-    echo "usage: claude-status hook|list|json|count|tmux|install" >&2
+    echo "usage: claude-status hook|list|json|touched|count|tmux|install" >&2
     exit 2
     ;;
 esac
