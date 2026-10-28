@@ -28,3 +28,4 @@ keybind = global:cmd+ctrl+l=toggle_quick_terminal
 app-notifications = no-clipboard-copy
 
 
+macos-option-as-alt = left
