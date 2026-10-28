@@ -26,6 +26,7 @@
     git
     gh
     lazygit
+    delta
     worktrunk
 
     # Languages and tooling
@@ -34,6 +35,7 @@
     uv
     ruff
     devenv
+    claude-code
 
     # Infra
     terraform
