@@ -20,7 +20,14 @@ else
     sessions=$(tmux list-sessions -F '● #{session_name}' 2>/dev/null || true)
   fi
 
-  dirs=$(find "${SEARCH_PATHS[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+  # Only search paths that exist: find fails on a missing one, and with
+  # pipefail that would end the script before the picker opens.
+  existing=()
+  for p in "${SEARCH_PATHS[@]}"; do [[ -d $p ]] && existing+=("$p"); done
+  dirs=""
+  if [[ ${#existing[@]} -gt 0 ]]; then
+    dirs=$(find "${existing[@]}" -mindepth 1 -maxdepth 1 -type d -not -name '.*' | sort -f)
+  fi
 
   # Preview script: if line starts with ●, show session windows;
   # otherwise show ls + recent git log of that directory.
@@ -45,7 +52,7 @@ else
     | fzf \
         --reverse \
         --border=rounded \
-        --prompt="❯ " \
+        --prompt="❯ " --gutter=" " \
         --header="enter: switch/create · ctrl-c: cancel" \
         --preview="$preview" \
         --preview-window="right:55%:wrap")
