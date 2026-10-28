@@ -51,8 +51,6 @@ export PATH=$PATH:$HOME/.dotfiles/bin
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles ; nvim ."
 
-# Rancher Desktop
-export PATH="$HOME/.rd/bin:$PATH"
 # Load machine-specific settings
 MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
 

@@ -65,8 +65,6 @@ in
 
     poetry
 
-    docker-client
-    docker-compose
     fluxcd
     azure-cli
     azure-functions-core-tools
@@ -85,7 +83,7 @@ in
       "microsoft-edge"
       "rider"
       "visual-studio-code"
-      "rancher"
+      "docker-desktop"
       "spotify"
     ];
     onActivation = {
