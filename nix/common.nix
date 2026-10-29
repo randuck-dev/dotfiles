@@ -1,5 +1,7 @@
 # Packages and fonts shared by every machine (NixOS and macOS).
 # Platform-only packages go in nix/configuration.nix (NixOS) or nix/darwin.nix (macOS).
+# claude-code is pinned to nixpkgs-unstable in each platform file (fast-moving releases),
+# so it isn't listed here.
 { pkgs, ... }:
 
 {
@@ -35,7 +37,6 @@
     uv
     ruff
     devenv
-    claude-code
 
     # Infra
     terraform

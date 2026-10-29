@@ -1,6 +1,6 @@
 # macOS (nix-darwin). One config for every Mac; machine-specific values stay
 # outside the repo (see git-identity.sh).
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 let
   dotnet = with pkgs.dotnetCorePackages; combinePackages [
@@ -68,6 +68,8 @@ in
     fluxcd
     azure-cli
     azure-functions-core-tools
+
+    pkgs-unstable.claude-code
   ];
 
   environment.variables.DOTNET_ROOT = "${dotnet}/share/dotnet";
