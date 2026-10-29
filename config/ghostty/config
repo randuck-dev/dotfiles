@@ -8,6 +8,8 @@ font-size = 16
 
 
 # Window
+background-opacity = 0.9
+background-blur-radius = 20
 confirm-close-surface = false
 resize-overlay = never
 window-padding-x = 0
