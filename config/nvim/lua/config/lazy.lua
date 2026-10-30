@@ -31,6 +31,9 @@ require("lazy").setup({
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
   install = { colorscheme = { "tokyonight", "habamax" } },
+  -- Plugins marked `dev = true` load from a local checkout in ~/projects
+  -- when there is one; otherwise (fallback) from their git remote.
+  dev = { path = "~/projects", fallback = true },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update

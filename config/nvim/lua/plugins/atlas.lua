@@ -1,13 +1,17 @@
--- nvim-atlas: sidebar over claude-status/git-review/gh for reviewing and
--- driving AI coding sessions across repos and worktrees. In active local
--- development at ~/projects/nvim-atlas; `dir` points there directly so
--- changes show up on the next `:Lazy reload nvim-atlas` without a commit.
+-- nvim-atlas (github.com/randuck-dev/nvim-atlas): sidebar over
+-- claude-status/git-review/gh for reviewing and driving AI coding sessions
+-- across repos and worktrees.
+--
+-- `dev = true`: lazy uses the local checkout at ~/projects/nvim-atlas when
+-- it exists (see `dev` in config/lazy.lua), so changes there show up on
+-- the next `:Lazy reload nvim-atlas` without a commit; machines without
+-- the checkout install it from GitHub.
 
 return {
   {
-    "nvim-atlas",
-    dir = vim.fn.expand("~/projects/nvim-atlas"),
-    dependencies = { "sindrets/diffview.nvim", "akinsho/toggleterm.nvim" },
+    "randuck-dev/nvim-atlas",
+    dev = true,
+    dependencies = { "sindrets/diffview.nvim" },
     cmd = { "AtlasToggle", "AtlasAnnotate" },
     keys = {
       { "<leader>ae", "<cmd>AtlasToggle<cr>", desc = "Atlas: toggle sidebar" },
