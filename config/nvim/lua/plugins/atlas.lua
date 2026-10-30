@@ -5,13 +5,27 @@
 -- `dev = true`: lazy uses the local checkout at ~/projects/nvim-atlas when
 -- it exists (see `dev` in config/lazy.lua), so changes there show up on
 -- the next `:Lazy reload nvim-atlas` without a commit; machines without
--- the checkout install it from GitHub.
+-- the checkout install it from GitHub, and update it on every start (see
+-- `init`), since lazy's update checker only checks.
 
 return {
   {
     "randuck-dev/nvim-atlas",
     dev = true,
     dependencies = { "sindrets/diffview.nvim" },
+    init = function()
+      if vim.uv.fs_stat(vim.fn.expand("~/projects/nvim-atlas")) then
+        return -- the local checkout is used as-is
+      end
+      -- In the background; the new version loads on the next start.
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        once = true,
+        callback = function()
+          require("lazy.manage").update({ plugins = { "nvim-atlas" }, show = false })
+        end,
+      })
+    end,
     cmd = { "AtlasToggle", "AtlasAnnotate" },
     keys = {
       { "<leader>ae", "<cmd>AtlasToggle<cr>", desc = "Atlas: toggle sidebar" },
