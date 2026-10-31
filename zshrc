@@ -51,9 +51,6 @@ export PATH=$PATH:$HOME/.dotfiles/bin
 alias bs="bash $HOME/.dotfiles/dev.sh"
 alias dots="cd $HOME/.dotfiles ; nvim ."
 
-# Load machine-specific settings
-MACHINE_SPECIFIC_RC="$HOME/.zshrc.local"
-
 if which uwsm > /dev/null; then
   if uwsm check may-start -q; then
       exec uwsm start hyprland-uwsm.desktop
@@ -82,3 +79,6 @@ if command -v wt >/dev/null 2>&1; then
     fi
   }
 fi
+
+# Machine-specific settings, kept outside the repo (see AGENTS.md).
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
